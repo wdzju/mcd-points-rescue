@@ -34,6 +34,9 @@ from urllib.parse import urlparse
 DEFAULT_PORT = 8723
 # Hard cap on request bodies — both endpoints take tiny JSON payloads.
 MAX_BODY_BYTES = 64 * 1024
+# Upper bound on how much oversized input we consume just to keep the socket
+# clean. Beyond this we accept the reset rather than read unbounded data.
+MAX_DRAIN_BYTES = 1024 * 1024
 _HOST = "127.0.0.1"
 _UI_PATH = Path(__file__).resolve().parent / "webui.html"
 # The live run writes to the gitignored root report, NOT docs/sample-report.html —
@@ -102,7 +105,13 @@ class _Handler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length") or 0)
         except (TypeError, ValueError):
             return {}
-        if length <= 0 or length > MAX_BODY_BYTES:
+        if length <= 0:
+            return {}
+        if length > MAX_BODY_BYTES:
+            # Drain before replying. Answering without consuming the body
+            # leaves the peer mid-send and it sees a connection reset instead
+            # of our JSON error — found by test_oversized_body_is_ignored.
+            self._drain(min(length, MAX_DRAIN_BYTES))
             return {}
         try:
             raw = self.rfile.read(length)
@@ -110,6 +119,18 @@ class _Handler(BaseHTTPRequestHandler):
         except (json.JSONDecodeError, UnicodeDecodeError, OSError):
             return {}
         return obj if isinstance(obj, dict) else {}
+
+    def _drain(self, n: int) -> None:
+        """Consume and discard n bytes from the request body."""
+        remaining = n
+        while remaining > 0:
+            try:
+                chunk = self.rfile.read(min(65536, remaining))
+            except OSError:
+                return
+            if not chunk:
+                return
+            remaining -= len(chunk)
 
     def do_GET(self) -> None:  # noqa: N802
         path = urlparse(self.path).path

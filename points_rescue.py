@@ -309,7 +309,20 @@ def main(argv: list[str] | None = None) -> int:
         )
     else:
         if not args.demo:
-            print("[hint] 未检测到 Token，已自动使用演示数据。加 --live 并配置 MCD_MCP_TOKEN 可跑真实数据。\n")
+            # Reached when the user ran the tool with no mode flag and has no
+            # token. Show the demo first — nobody configures credentials for a
+            # tool they have not seen the output of yet.
+            print()
+            print("  " + "-" * 62)
+            print("  还没配置麦当劳 MCP Token，先用演示数据让你看看效果。")
+            print()
+            print("  想看自己的真实数据，任选一种：")
+            print("    python points_rescue.py --web      浏览器里三步走完（推荐）")
+            print("    python points_rescue.py --setup    在当前终端引导配置")
+            print()
+            print("  Token 免费申请，大约 1 分钟；存本机，不会上传。")
+            print("  " + "-" * 62)
+            print()
         data = analyse(
             mode="demo",
             risk_profile=args.risk,
@@ -322,6 +335,16 @@ def main(argv: list[str] | None = None) -> int:
     out = Path(args.out)
     out.write_text(render(data), encoding="utf-8")
     print(f"\n  HTML 报告已生成：{out.resolve()}")
+
+    # Always tell the reader what to do next when the report was built from
+    # sample data — otherwise the output looks like a dead end.
+    if data.mode == "demo":
+        print()
+        print("  " + "-" * 62)
+        print("  以上是演示数据，不是你的账户。")
+        print("  想看自己的积分被蒸发了多少：")
+        print("    python points_rescue.py --web")
+        print("  " + "-" * 62)
 
     if args.json_out:
         Path(args.json_out).write_text(

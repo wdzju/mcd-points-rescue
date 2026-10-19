@@ -147,7 +147,7 @@ python points_rescue.py --demo
 
 ```bash
 python -m unittest discover -s tests
-# Ran 52 tests ... OK
+# Ran 107 tests ... OK
 ```
 
 ### 3 分钟：跑你自己的真实数据
@@ -566,7 +566,7 @@ mcd-points-rescue/
 │   ├── analyze.py              编排：取数 → 估值 → 背包 → 决策
 │   ├── report.py               单文件 HTML 报告渲染
 │   └── demo_data.py            脱敏样例数据（结构与真实响应一致）
-├── tests/                      70 个单测，覆盖实网踩过的坑
+├── tests/                      107 个单测，覆盖实网踩过的坑
 └── docs/
     ├── sample-report.html      真实数据样例报告
     └── WORKBUDDY.md            在 WorkBuddy 中的安装与使用
