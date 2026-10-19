@@ -16,6 +16,16 @@
   <a href="DESIGN.md">设计系统</a>
 </p>
 
+<p align="center">
+  <img src="docs/screenshots/index.jpg" alt="项目展示页：卡通风格的麦麦积分清算局落地页" width="880">
+</p>
+<p align="center"><sub>项目展示页 —— 卡通风格，麦当劳红金配色，手绘 SVG 插画</sub></p>
+
+<p align="center">
+  <img src="docs/screenshots/report.jpg" alt="积分体检报告：健康分 58、44% 蒸发率、折扣券价差排行" width="880">
+</p>
+<p align="center"><sub>报告第一屏 —— 一句话结论 + 积分健康分 + 趣味事实，往下才是技术细节</sub></p>
+
 ---
 
 ## 三种人，三种用法
@@ -184,6 +194,11 @@ python points_rescue.py --web
 会自动打开 `http://127.0.0.1:8723` —— 页面上有三步：点按钮去官网拿 Token → 回来粘贴 → 直接出报告。
 服务只监听 `127.0.0.1`，外部访问不到；Token 存本机，不出机器。
 生成的报告写到项目根的 `report.html`，不会覆盖 `docs/sample-report.html`。
+
+<p align="center">
+  <img src="docs/screenshots/web.jpg" alt="本机配置面板：三步接上你的积分" width="820">
+</p>
+<p align="center"><sub>本机配置面板 —— 只监听 127.0.0.1，短信验证那一步刻意留在官网</sub></p>
 
 在 WorkBuddy 里用：见 [docs/WORKBUDDY.md](docs/WORKBUDDY.md)，本项目本身就是一个可直接安装的 Skill。
 
