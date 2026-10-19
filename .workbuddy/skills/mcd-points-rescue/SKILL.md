@@ -23,7 +23,34 @@ allowed-tools: Read,Write,Bash
 
 ---
 
-## 第 0 步：先确认运行环境
+## 第 0 步：确认目录与运行环境
+
+### 0.1 先确认当前在项目目录
+
+```bash
+ls points_rescue.py
+```
+
+| 结果 | 含义 | 处理 |
+|---|---|---|
+| 列出 `points_rescue.py` | 已在项目目录 | 继续 0.2 |
+| `No such file or directory` | 工作区不是项目目录 | 执行下面的 cd |
+
+**全局安装的用户**（Skill 装在 `~/.workbuddy/skills/`）常见此情况：
+
+```bash
+# macOS / Linux
+cd ~/.workbuddy/skills/mcd-points-rescue
+```
+
+```powershell
+# Windows
+cd "$env:USERPROFILE\.workbuddy\skills\mcd-points-rescue"
+```
+
+进去之后先确认 `points_rescue.py` 在，再往下走。
+
+### 0.2 确认 Python 可用
 
 ```bash
 python --version

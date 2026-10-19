@@ -2,32 +2,72 @@
 
 本项目既是一个独立 CLI 工具，也是一个 WorkBuddy Skill。
 
-## 方式一：直接打开仓库目录（推荐）
+## 方式一：装成全局技能（推荐）
 
-**不需要任何安装步骤。**
+装一次，之后**任何** WorkBuddy 会话里都能用。
 
-1. 用 WorkBuddy 打开**这个仓库的根目录**（不是它的父目录）
-2. 直接说：「帮我看看我的麦当劳积分」
+```bash
+# macOS / Linux
+mkdir -p ~/.workbuddy/skills
+git clone https://github.com/wdzju/mcd-points-rescue ~/.workbuddy/skills/mcd-points-rescue
+```
 
-AI 会自动读取 `.workbuddy/skills/mcd-points-rescue/SKILL.md`，按内置流程执行。
+```powershell
+# Windows PowerShell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.workbuddy\skills" | Out-Null
+git clone https://github.com/wdzju/mcd-points-rescue "$env:USERPROFILE\.workbuddy\skills\mcd-points-rescue"
+```
 
-> **为什么必须是仓库目录**：WorkBuddy 只扫描 `{工作区}/.workbuddy/skills/`。
-> 打开父目录的话，Skill 不会被自动加载。
+**重启 WorkBuddy**，然后在任意会话里说：
 
-### 第一次会发生什么
+> 帮我看看我的麦当劳积分
+
+没有 git 的话，下载 ZIP 解压到 `~/.workbuddy/skills/`
+（Windows：`%USERPROFILE%\.workbuddy\skills\`）也一样：
+<https://github.com/wdzju/mcd-points-rescue/archive/refs/heads/main.zip>
+
+### 装完怎么确认
+
+在 WorkBuddy 里问「你有 mcd-points-rescue 这个技能吗」，或者确认文件存在：
+
+```bash
+ls ~/.workbuddy/skills/mcd-points-rescue/SKILL.md
+```
+
+## 方式二：不装，直接打开目录
+
+```bash
+git clone https://github.com/wdzju/mcd-points-rescue
+```
+
+用 WorkBuddy 打开 `mcd-points-rescue` 这个目录，说同一句话。
+
+> **必须是仓库目录本身，不能是它的上级目录。**
+> WorkBuddy 只扫描 `{工作区}/.workbuddy/skills/`，打开上级目录时 Skill 不会被加载。
+
+### 两种方式的区别
+
+| | 全局安装 | 打开目录 |
+|---|---|---|
+| 装一次 | 之后到处能用 | 每次都要打开对目录 |
+| 代码位置 | `~/.workbuddy/skills/mcd-points-rescue/` | 你 clone 的地方 |
+| 更新 | 在技能目录 `git pull` | 在仓库目录 `git pull` |
+| 适合 | 长期使用 | 试一次 |
+
+## 第一次会发生什么
 
 你大概率还没配 Token，所以会看到这个流程：
 
 ```
-AI：检查 Token → 没找到
+你说「帮我看看我的麦当劳积分」
   ↓
-AI：先跑演示模式，生成一份样例报告
+它检查 Token → 没找到
   ↓
-AI：报告在 report.html，你先看看长什么样
+先用演示数据跑一份，告诉你报告在 report.html
   ↓
-你想跑真实数据 → AI 引导你在终端执行 --setup 或 --web
+你想看真实数据 → 它引导你在终端执行 --setup 或 --web
   ↓
-配好 → AI 自检 → 跑分析 → 用大白话讲结论
+配好 → 自检 → 跑你自己的账户 → 用大白话讲结论
 ```
 
 **Token 全程不经过对话** —— 你在自己的终端里粘贴，AI 看不到。
@@ -42,27 +82,6 @@ AI：报告在 report.html，你先看看长什么样
 
 > 帮我把快过期的积分安排掉，给个方案
 
-## 方式二：装到用户级 skills 目录
-
-如果你想让**所有** WorkBuddy 工作区都能用这个 Skill，可以装到用户级目录。
-
-```bash
-# macOS / Linux
-mkdir -p ~/.workbuddy/skills/mcd-points-rescue
-cp SKILL.md ~/.workbuddy/skills/mcd-points-rescue/
-```
-
-```powershell
-# Windows PowerShell
-New-Item -ItemType Directory -Force "$env:USERPROFILE\.workbuddy\skills\mcd-points-rescue"
-Copy-Item SKILL.md "$env:USERPROFILE\.workbuddy\skills\mcd-points-rescue\"
-```
-
-⚠️ **但这样有个问题**：用户级 Skill 目录里只有 `SKILL.md`，**没有代码**。
-执行 `python points_rescue.py` 时，取决于你当时的工作区是不是这个项目目录。
-
-**结论：只在你确实需要跨项目调用时才装。日常使用方式一就够。**
-
 ## 不需要配置 MCP 连接器
 
 本项目的 CLI **自己直连** `https://mcp.mcd.cn`（见 `src/mcp_client.py`），
@@ -72,13 +91,6 @@ Copy-Item SKILL.md "$env:USERPROFILE\.workbuddy\skills\mcd-points-rescue\"
 WorkBuddy / 其他 MCP 客户端的通用配置参考，跑本项目的 CLI 时用不上。
 
 Token 通过 `--token` / 环境变量 `MCD_MCP_TOKEN` / 本地文件三选一提供即可。
-
-## 手动触发（工作区不是仓库目录时）
-
-如果你已经在别的项目里，想临时用一下这个 Skill：
-
-1. 在对话里 `@` 引用这个仓库的 `SKILL.md`
-2. 或直接说：「读一下 `<仓库路径>/SKILL.md`，按它的流程帮我跑麦当劳积分分析」
 
 ## Skill 与 CLI 的分工
 
@@ -94,14 +106,29 @@ Token 通过 `--token` / 环境变量 `MCD_MCP_TOKEN` / 本地文件三选一提
 ## 常见问题
 
 **Q：AI 说找不到 `points_rescue.py`？**
-A：工作区不对。确认 WorkBuddy 打开的是仓库根目录，那里应该有 `points_rescue.py`。
+
+A：当前目录不对。全局安装的请先执行：
+
+```bash
+cd ~/.workbuddy/skills/mcd-points-rescue
+```
+
+Windows 用 `cd "$env:USERPROFILE\.workbuddy\skills\mcd-points-rescue"`。
+进去后确认 `points_rescue.py` 在里面。
 
 **Q：AI 让我把 Token 发给它？**
+
 A：不该这样。SKILL.md 里明确写了不能索要 Token。请拒绝，并让它引导你
 在自己的终端跑 `python points_rescue.py --setup`。
 
 **Q：跑出来覆盖率很低（30% 左右）？**
+
 A：多半是早餐时段（10:30 前），菜单里没有正餐单品。换到 10:30 之后再跑。
 
+**Q：Mac 上 `python` 报 command not found？**
+
+A：用 `python3`。下文所有命令都替换成 `python3 points_rescue.py`。
+
 **Q：能不能自动帮我兑换？**
+
 A：不能，这是设计上的边界。本项目只读，所有操作需要你在麦当劳 App 里手动完成。

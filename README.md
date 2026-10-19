@@ -200,21 +200,73 @@ python points_rescue.py --web
 </p>
 <p align="center"><sub>本机配置面板 —— 只监听 127.0.0.1，短信验证那一步刻意留在官网</sub></p>
 
-### 作为 WorkBuddy Skill 使用
+### 作为 WorkBuddy Skill 使用：一组命令装上，一句话就能用
 
-本项目自带 Skill 定义，**不需要手动配置**。前提只有一个：用 WorkBuddy 打开**仓库目录本身**
-（不是它的父目录），然后直接说「帮我看看我的麦当劳积分」。
+#### 路线 A · 装成全局技能（推荐，装一次到处能用）
 
-AI 会自动读取 `.workbuddy/skills/mcd-points-rescue/SKILL.md`，按内置流程执行：
+复制这段，整段粘进终端：
+
+```bash
+# macOS / Linux
+mkdir -p ~/.workbuddy/skills
+git clone https://github.com/wdzju/mcd-points-rescue ~/.workbuddy/skills/mcd-points-rescue
+```
+
+```powershell
+# Windows PowerShell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.workbuddy\skills" | Out-Null
+git clone https://github.com/wdzju/mcd-points-rescue "$env:USERPROFILE\.workbuddy\skills\mcd-points-rescue"
+```
+
+**重启 WorkBuddy**，然后在任意会话里说：
+
+> 帮我看看我的麦当劳积分
+
+#### 路线 B · 只想试一次，不装
+
+```bash
+git clone https://github.com/wdzju/mcd-points-rescue
+```
+
+用 WorkBuddy 打开 `mcd-points-rescue` 这个目录（**不是它的上级目录**），说同一句话。
+
+> 为什么强调目录：WorkBuddy 只扫描 `{工作区}/.workbuddy/skills/`。
+> 打开上级目录，Skill 不会被加载。
+
+#### 没有 git？
+
+下载 ZIP 解压到对应目录，效果一样：
 
 ```
-检查 Token → 没有就先跑演示给你看 → 再引导你配置 → 自检 → 分析 → 用大白话讲结论
+https://github.com/wdzju/mcd-points-rescue/archive/refs/heads/main.zip
 ```
 
-**没 Token 也能启动** —— 它会先用演示数据生成一份报告，你看到效果之后再决定要不要配置。
+- 路线 A：解压到 `~/.workbuddy/skills/`（Windows：`%USERPROFILE%\.workbuddy\skills\`）
+- 路线 B：解压到任意位置
 
-> 为什么必须打开仓库目录：WorkBuddy 只扫描 `{工作区}/.workbuddy/skills/`。
-> 如果打开的是父目录，Skill 不会被加载（但你仍然可以手动 @ 引用 `SKILL.md`）。
+#### 怎么确认装好了
+
+在 WorkBuddy 里问一句「你有 mcd-points-rescue 这个技能吗」，或者在终端确认文件存在：
+
+```bash
+ls ~/.workbuddy/skills/mcd-points-rescue/SKILL.md
+```
+
+#### 装上之后会发生什么
+
+```
+你说「帮我看看我的麦当劳积分」
+      ↓
+它检查 Token → 没配
+      ↓
+先用演示数据跑一份，告诉你报告在哪
+      ↓
+你觉得有用 → 它引导你在终端配 Token（Token 不经过对话）
+      ↓
+配好 → 自检 → 跑你自己的账户 → 用大白话讲结论
+```
+
+**没 Token 也能启动** —— 这是刻意设计的。先看到效果，再决定要不要配置。
 
 详细说明见 [docs/WORKBUDDY.md](docs/WORKBUDDY.md)。
 
