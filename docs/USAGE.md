@@ -137,7 +137,71 @@ python points_rescue.py --forget
 
 ---
 
-## 4. 跑出奇怪结果时，先看这两点
+## 4. 在 WorkBuddy 里用（对话式，最省事）
+
+这一节讲怎么把它变成一个「说一句话就能用」的技能。
+
+### 4.1 两种装法
+
+**装成全局技能（推荐）** —— 装一次，之后任何会话都能用：
+
+```bash
+# macOS / Linux
+mkdir -p ~/.workbuddy/skills
+git clone https://github.com/wdzju/mcd-points-rescue ~/.workbuddy/skills/mcd-points-rescue
+```
+
+Windows 上把目标路径换成 `%USERPROFILE%\.workbuddy\skills\mcd-points-rescue`。
+
+重启 WorkBuddy，然后在任意会话里说：
+
+> 帮我看看我的麦当劳积分
+
+**不装，直接打开目录** —— 只想试一次的话：
+
+```bash
+git clone https://github.com/wdzju/mcd-points-rescue
+```
+
+用 WorkBuddy 打开这个目录（**必须是仓库目录本身，不能是上级目录**），说同一句话。
+
+> 为什么强调：WorkBuddy 只扫描 `{工作区}/.workbuddy/skills/`。
+> 打开上级目录时，技能不会被加载。
+
+### 4.2 最轻的方式：复制一行链接
+
+连克隆都不想要的话，把你的 Token 配进 WorkBuddy 的 MCP 连接器，然后直接发这句：
+
+```
+读一下 https://raw.githubusercontent.com/wdzju/mcd-points-rescue/main/SKILL-lite.md 然后按里面的流程帮我查麦当劳积分
+```
+
+AI 会自己去读那份纯提示词的说明，然后调接口、算结果、讲结论。
+这是**零安装**路径，代价是精度不如 Python 版（模糊匹配靠 AI，结果不可完全复现）。
+
+### 4.3 不需要配置 MCP 连接器（完整版的情况）
+
+项目的 CLI **自己直连** `https://mcp.mcd.cn`，不依赖 WorkBuddy 的连接器机制。
+
+所以跑 `python points_rescue.py --live` 时**不用**去【连接器】里配置 `mcd-mcp`。
+`mcp-config.example.json` 只是给 WorkBuddy 或其他 MCP 客户端用的通用参考。
+
+Token 通过 `--token` / 环境变量 `MCD_MCP_TOKEN` / 本地文件三选一提供即可。
+
+### 4.4 两种形态的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 日常快速问一句 | 对话式（Skill） |
+| 要存档 HTML 报告 | CLI `--out` |
+| 要做二次开发 | CLI `--json` |
+| 校准字段名 | CLI `--dump-raw` |
+
+分析引擎完全相同，Skill 只是包了一层自然语言交互。
+
+---
+
+## 5. 跑出奇怪结果时，先看这两点
 
 ### 现在是几点？
 
@@ -168,7 +232,7 @@ python points_rescue.py --live --city 上海市 --store <你的门店编码>
 
 ---
 
-## 5. 常见问题
+## 6. 常见问题
 
 **Q：跑完说"缺少 MCP Token"？**
 A：你还没配置。用 `--setup` 或 `--web`，或者设环境变量。只想看效果就直接 `--demo`。
@@ -191,7 +255,7 @@ A：不会。Token 存在你本机，所有请求都是你的电脑直接发给�
 
 ---
 
-## 6. 想二次开发？
+## 7. 想二次开发？
 
 - 架构与模块说明：[MCP_INTEGRATION.md](../MCP_INTEGRATION.md)
 - 设计系统（配色、排版、组件规范）：[DESIGN.md](../DESIGN.md)

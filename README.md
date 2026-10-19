@@ -335,7 +335,8 @@ ls ~/.workbuddy/skills/mcd-points-rescue/SKILL.md
 
 **没 Token 也能启动** —— 这是刻意设计的。先看到效果，再决定要不要配置。
 
-详细说明见 [docs/WORKBUDDY.md](docs/WORKBUDDY.md)。
+两种装法的完整说明、装完怎么验证、常见问题，都在
+[docs/USAGE.md 第 4 节](docs/USAGE.md)。
 
 ### 为什么不做一个登录页面
 
@@ -383,32 +384,8 @@ ls ~/.workbuddy/skills/mcd-points-rescue/SKILL.md
 
 ## 算法说明
 
-### 0. 先活下来：MCP 返回的不是 JSON
-
-这是接入时踩到的第一个、也是最大的坑。
-
-麦当劳 MCP 的每个工具返回的都不是结构化 JSON，而是一段**写给 LLM 看的 Markdown 叙述**，机器可读的部分藏在里面：
-
-```
-# API Response Information
-Below is the response from an API call...
-## Response Structure
-- **data.availablePoint**: 可用积分 (Type: string)
-## Original Response
-
-{"success":true,"code":200,"data":{"availablePoint":"556.5",...}}
-```
-
-而且**不同工具的包装方式还不一样** —— 「账户」「商城」「菜单」用 `## Original Response`，
-「门店」却把 JSON 内联在两行描述文字中间。
-
-所以 `json.loads(工具返回值)` 必失败，锚定 `## Original Response` 也会漏。
-
-`src/mcp_payload.py` 的解法，按成本从低到高：
-
-1. **行扫描** — 绝大多数响应把 JSON 放在单独一行，逐行试 `json.loads`
-2. **括号平衡扫描** — 通用兜底，字符串感知（正确处理字符串内的 `{}`）
-3. **放弃** — 返回 None，让上层降级，绝不崩
+> MCP 返回格式的坑（报文不是 JSON、字段类型不一致、字段名拼写差异）
+> 在 [MCP_INTEGRATION.md](./MCP_INTEGRATION.md) 里讲得更细，这里不重复。
 
 ### 1. 定价锚点：菜单是唯一的人民币来源
 
@@ -686,6 +663,15 @@ python points_rescue.py --live --plan plan.md
 ```
 mcd-points-rescue/
 ├── points_rescue.py            CLI 入口
+├── SKILL.md                    WorkBuddy Skill 定义（完整版）
+├── SKILL-lite.md               WorkBuddy Skill 定义（纯提示词版，零安装）
+├── CONTEST_DECLARATION.md      参赛声明（官方模板，内容未改动）
+├── MCP_INTEGRATION.md          MCP 调用说明与踩坑记录
+├── mcp-config.example.json     脱敏配置示例
+├── workbuddy.md                WorkBuddy 开发上下文
+├── DESIGN.md                   设计系统（配色 / 排版 / 组件规范）
+├── README.md                   本文件
+├── LICENSE                     MIT
 ├── src/
 │   ├── mcp_client.py           Streamable HTTP + JSON-RPC 2.0 客户端
 │   ├── mcp_payload.py          Markdown 报文拆包器（本项目最大的坑）
@@ -704,7 +690,11 @@ mcd-points-rescue/
 ├── tests/                      107 个单测，覆盖实网踩过的坑
 └── docs/
     ├── sample-report.html      真实数据样例报告
-    └── WORKBUDDY.md            在 WorkBuddy 中的安装与使用
+    ├── USAGE.md                完整使用手册（含 WorkBuddy 用法）
+    └── screenshots/            README 用的实机截图
+```
+
+零第三方依赖，只用 Python 3.9+ 标准库。
 
 ---
 
@@ -730,17 +720,6 @@ mcd-points-rescue/
 
 健康分由两项决定：历史损耗率（最多 −40）与券兑现率（最多 −30）。
 真实账号 58 分，称号「随缘型选手」。
-├── SKILL.md                    WorkBuddy Skill 定义
-├── CONTEST_DECLARATION.md      参赛声明（官方模板，内容未改动）
-├── MCP_INTEGRATION.md          MCP 调用说明与踩坑记录
-├── mcp-config.example.json     脱敏配置示例
-├── workbuddy.md                WorkBuddy 开发上下文
-└── docs/
-    ├── sample-report.html      真实数据样例报告
-    └── WORKBUDDY.md            在 WorkBuddy 中的安装与使用
-```
-
-**零第三方依赖**，只用 Python 3.9+ 标准库。
 
 ---
 
