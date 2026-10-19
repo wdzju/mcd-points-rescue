@@ -200,7 +200,50 @@ python points_rescue.py --web
 </p>
 <p align="center"><sub>本机配置面板 —— 只监听 127.0.0.1，短信验证那一步刻意留在官网</sub></p>
 
-### 作为 WorkBuddy Skill 使用：一组命令装上，一句话就能用
+### 先试轻量版：一条命令装好，不用克隆、不用 Python
+
+**前提只有一个**：在 WorkBuddy 里配好麦当劳 MCP 连接器（填一次 Token 就行）。
+
+```bash
+mkdir -p ~/.workbuddy/skills/mcd-points-check
+curl -fsSL https://raw.githubusercontent.com/wdzju/mcd-points-rescue/main/SKILL-lite.md \
+  -o ~/.workbuddy/skills/mcd-points-check/SKILL.md
+```
+
+重启 WorkBuddy，然后说「帮我查麦当劳积分」。
+
+**连这条都不想敲？** 直接把这 20 行粘进对话框，立刻能用：
+
+```
+帮我查麦当劳积分，按这个流程：
+1. 调 query-my-account 拿积分数据
+2. 调 mall-points-products 拿可兑换券
+3. 调 query-nearby-stores 和 query-meals 拿菜单价格
+4. 券的收益 = 菜单同名餐品原价 − 券名里的价格
+   （例如"18.8元麦辣鸡腿汉堡两件套"，18.8 是我要付的钱，不是券的价值）
+5. 全部换算成「元/100积分」再排序：收益 ÷ 积分 × 100
+6. 告诉我：蒸发率是多少、最值得换的三张券、本月到期的分怎么花
+
+找不到同名餐品就标"无法估值"，不要用别的商品猜。
+```
+
+**轻量版和完整版的区别**：
+
+| | 轻量版（提示词） | 完整版（Python） |
+|---|---|---|
+| 安装 | 一条 curl，无需克隆 | clone + Python 3.9+ |
+| 依赖 | 只要连接器 | Python 标准库 |
+| 券名匹配 | AI 模糊匹配，可能有偏差 | 程序精确匹配 + 类目兜底 |
+| 清仓方案 | 贪心近似 | 背包最优解 |
+| 抽奖 EV | 没有概率时只能定性 | 用历史中奖校准 |
+| 输出 | 对话里直接说 | 单文件 HTML 报告 |
+| 适合 | 想快速知道结论 | 要精确、要存档、要复现 |
+
+两条路都能用，轻量版负责「先看到结论」，完整版负责「算得准」。
+
+---
+
+### 完整版：克隆仓库，生成 HTML 报告
 
 #### 路线 A · 装成全局技能（推荐，装一次到处能用）
 
