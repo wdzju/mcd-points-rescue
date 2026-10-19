@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>麦麦积分清算局 · 你的积分正在悄悄蒸发</title>
+<style>
+:root{
+  --cream:#FCFAF4; --paper:#FFFFFF; --oat:#EDE6D8; --oat-2:#F5F0E6;
+  --ink:#231F1A; --ink-2:#5C554B; --ink-3:#8B8378;
+  --red:#DA291C; --red-dk:#A81E14; --gold:#FFC72C; --gold-lt:#FFE9A8;
+  --matcha:#8FB03E; --slushie:#4FB3C9;
+  --r-lg:36px; --r-md:26px; --r-sm:16px;
+  --sh-soft:0 1px 1px rgba(35,31,26,.04), 0 10px 28px rgba(35,31,26,.06),
+    inset 0 -1px 0 rgba(35,31,26,.03);
+  --sh-lift:0 2px 2px rgba(35,31,26,.05), 0 18px 40px rgba(35,31,26,.10),
+    inset 0 -1px 0 rgba(35,31,26,.03);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+/* ---------- top bar ---------- */
+.nav{padding:22px 0;display:flex;align-items:center;gap:12px}
+.nav .mark{display:flex;align-items:center;gap:10px;font-weight:500;letter-spacing:-.2px}
+.nav .spacer{flex:1}
+.nav a{color:var(--ink-2);text-decoration:none;font-size:14px;padding:8px 14px;border-radius:999px}
+.nav a:hover{background:var(--oat-2);color:var(--ink)}
+.chip{font-size:12px;padding:6px 13px;border-radius:999px;background:var(--gold-lt);
+  color:#7A4E00;border:1px solid #F0D48A}
+
+/* ---------- hero ---------- */
+.hero{padding:26px 0 70px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:40px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);
+  background:var(--paper);border:1px solid var(--oat);border-radius:999px;padding:7px 15px;
+  box-shadow:var(--sh-soft);margin-bottom:24px}
+h1{font-size:clamp(38px,5.4vw,64px);line-height:1.08;letter-spacing:-2.4px;font-weight:600}
+/* z-index:0 creates a stacking context so the :after highlight at z-index:-1
+   paints above the page background but below the glyphs. Without it the
+   negative layer escapes to the root stacking context and disappears behind
+   the body background. */
+h1 .hl{color:var(--red);position:relative;z-index:0;white-space:nowrap}
+h1 .hl:after{content:"";position:absolute;left:0;right:0;bottom:.08em;height:.28em;
+  background:var(--gold);opacity:.5;border-radius:4px;z-index:-1}
+.lede{margin-top:22px;font-size:18px;color:var(--ink-2);max-width:30em;line-height:1.72}
+.lede b{color:var(--ink);font-weight:600}
+.cta-row{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:15px 26px;border-radius:999px;
+  font-size:15px;font-weight:500;text-decoration:none;border:1px solid transparent;
+  transition:transform .22s cubic-bezier(.34,1.4,.64,1), box-shadow .22s, background .18s}
+.btn-p{background:var(--red);color:#fff;box-shadow:6px 6px 0 rgba(35,31,26,.14)}
+.btn-p:hover{transform:rotate(-2deg) translateY(-3px);box-shadow:9px 10px 0 rgba(35,31,26,.16)}
+.btn-s{background:var(--paper);color:var(--ink);border-color:var(--oat);box-shadow:var(--sh-soft)}
+.btn-s:hover{transform:rotate(-1.5deg) translateY(-3px);box-shadow:var(--sh-lift)}
+.meta{margin-top:22px;font-size:13px;color:var(--ink-3)}
+.meta code{background:var(--oat-2);padding:3px 8px;border-radius:7px;font-size:12.5px}
+
+/* ---------- hero art ---------- */
+.art{position:relative;display:flex;justify-content:center;align-items:center;min-height:340px}
+/* Decorative circles must stay inside the 340px box — a 390px ring used to
+   spill out and collide with the stats grid below. */
+.art .blob{position:absolute;width:290px;height:290px;border-radius:50%;
+  background:var(--gold);opacity:.24}
+.art .ring{position:absolute;width:322px;height:322px;border-radius:50%;
+  border:2px dashed var(--oat)}
+/* The artwork has intrinsic 330px dimensions; without this it overflows the
+   250px column on narrow screens. */
+.art svg{position:relative;max-width:100%;height:auto}
+.float{animation:float 5.5s ease-in-out infinite}
+.float-2{animation:float 5.5s ease-in-out infinite .9s}
+.float-3{animation:float 5.5s ease-in-out infinite 1.8s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
+@media (prefers-reduced-motion:reduce){.float,.float-2,.float-3{animation:none}}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:52px}
+.stat{background:var(--paper);border:1px solid var(--oat);border-radius:var(--r-md);
+  padding:24px 22px;box-shadow:var(--sh-soft);transition:transform .22s,box-shadow .22s}
+.stat:hover{transform:translateY(-4px);box-shadow:var(--sh-lift)}
+.stat .cap{font-size:12.5px;color:var(--ink-3);margin-bottom:8px}
+.stat .big{font-size:40px;font-weight:600;letter-spacing:-1.8px;line-height:1}
+.stat .big small{font-size:16px;font-weight:500;letter-spacing:0}
+/* "2.91 vs 8.40" is the widest cell in the row; cap it so it cannot overflow
+   a quarter-width card on mid-size screens. */
+.stat .big.cmp{font-size:31px;letter-spacing:-1.2px}
+.stat .big.cmp small{font-size:14px}
+.stat .note{font-size:12.5px;color:var(--ink-2);margin-top:9px;line-height:1.55}
+.stat.hot .big{color:var(--red)}
+
+/* ---------- sections ---------- */
+section.blk{padding:66px 0}
+.kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  margin-bottom:14px}
+h2{font-size:clamp(28px,3.6vw,42px);letter-spacing:-1.6px;line-height:1.18;font-weight:600}
+.sub2{margin-top:14px;font-size:16.5px;color:var(--ink-2);max-width:44em;line-height:1.7}
+
+/* ---------- feature cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:38px}
+.card{background:var(--paper);border:1px solid var(--oat);border-radius:var(--r-lg);
+  padding:28px 26px;box-shadow:var(--sh-soft);position:relative;overflow:hidden;
+  transition:transform .24s cubic-bezier(.34,1.3,.64,1),box-shadow .24s}
+.card:hover{transform:translateY(-6px) rotate(-.6deg);box-shadow:var(--sh-lift)}
+.card .ic{width:62px;height:62px;border-radius:20px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:20px}
+.card h3{font-size:18.5px;letter-spacing:-.5px;font-weight:600;margin-bottom:9px}
+.card p{font-size:14.5px;color:var(--ink-2);line-height:1.68}
+.card .tagx{margin-top:16px;display:inline-block;font-size:11.5px;padding:5px 11px;
+  border-radius:999px;background:var(--oat-2);color:var(--ink-2)}
+.ic-red{background:#FDECEA}.ic-gold{background:#FFF3CE}.ic-matcha{background:#EEF5E1}
+.ic-slush{background:#E4F3F7}.ic-oat{background:var(--oat-2)}.ic-pink{background:#FCE9EF}
+
+/* ---------- quote / finding ---------- */
+.finding{margin-top:36px;background:var(--ink);color:#fff;border-radius:var(--r-lg);
+  padding:40px 42px;position:relative;overflow:hidden}
+.finding:after{content:"";position:absolute;right:-60px;bottom:-90px;width:280px;height:280px;
+  border-radius:50%;background:var(--red);opacity:.32}
+.finding .q{font-size:clamp(20px,2.5vw,28px);line-height:1.45;letter-spacing:-.9px;
+  font-weight:500;position:relative;max-width:26em}
+.finding .q em{font-style:normal;color:var(--gold)}
+.finding .src{margin-top:18px;font-size:13px;opacity:.72;position:relative}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px;counter-reset:s}
+.step{background:var(--paper);border:1px solid var(--oat);border-radius:var(--r-md);
+  padding:26px 24px;box-shadow:var(--sh-soft);position:relative}
+.step:before{counter-increment:s;content:counter(s);width:34px;height:34px;border-radius:12px;
+  background:var(--gold);color:#5A3E00;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:600;margin-bottom:16px}
+.step h4{font-size:16.5px;font-weight:600;margin-bottom:8px;letter-spacing:-.3px}
+.step p{font-size:14px;color:var(--ink-2);line-height:1.65}
+.step code{background:var(--oat-2);padding:2px 7px;border-radius:6px;font-size:12.5px;
+  word-break:break-all}
+
+/* ---------- preview ---------- */
+/* The preview used to be an <iframe src="../docs/...">. That breaks anywhere
+   the relative path does not resolve — static preview servers, GitHub
+   sub-directory hosting, opening the file directly — leaving an empty box.
+   A self-contained mock of the report always renders. */
+.preview{margin-top:36px;background:var(--paper);border:1px solid var(--oat);
+  border-radius:var(--r-lg);padding:9px;box-shadow:var(--sh-lift);overflow:hidden}
+.pv{background:var(--cream);border-radius:30px;overflow:hidden}
+.pv-bar{display:flex;align-items:center;gap:7px;padding:13px 18px;background:#fff;
+  border-bottom:1px solid var(--oat)}
+.pv-bar i{width:10px;height:10px;border-radius:50%;background:var(--oat);display:block}
+.pv-bar i:first-child{background:#F0A0A0}
+.pv-bar i:nth-child(2){background:#F5D48A}
+.pv-bar i:nth-child(3){background:#A8C98A}
+.pv-bar span{font-size:11.5px;color:var(--ink-3);margin-left:8px}
+.pv-hero{background:var(--red);color:#fff;padding:24px 26px 26px}
+.pv-hero .t{font-size:14px;opacity:.9;margin-bottom:9px}
+.pv-hero .q{font-size:clamp(17px,2vw,23px);font-weight:500;line-height:1.45;letter-spacing:-.6px}
+.pv-hero .q b{color:var(--gold)}
+.pv-mid{display:flex;gap:14px;padding:18px 22px;background:#fff;border-bottom:1px solid var(--oat)}
+.pv-ring{width:64px;height:64px;flex:none;border-radius:50%;
+  background:conic-gradient(var(--red) 0 58%, var(--oat) 58% 100%);
+  display:flex;align-items:center;justify-content:center}
+.pv-ring div{width:48px;height:48px;border-radius:50%;background:#fff;display:flex;
+  flex-direction:column;align-items:center;justify-content:center}
+.pv-ring .n{font-size:18px;font-weight:600;line-height:1;letter-spacing:-.8px}
+.pv-ring .c{font-size:8.5px;color:var(--ink-3);margin-top:2px}
+.pv-score .g{font-size:16px;font-weight:600;margin-bottom:3px}
+.pv-score .d{font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.pv-list{padding:8px 22px 20px}
+.pv-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--oat-2)}
+.pv-row:last-child{border-bottom:0}
+.pv-row .r1{width:20px;font-size:12px;color:var(--ink-3);flex:none}
+.pv-row .ph{width:34px;height:34px;border-radius:9px;background:var(--gold-lt);flex:none}
+.pv-row .nm{flex:1;font-size:13.5px}
+.pv-row .pt{font-size:12.5px;color:var(--ink-2);flex:none}
+.pv-row .vv{font-size:13.5px;font-weight:600;flex:none;min-width:62px;text-align:right}
+.pv-row .vv em{font-style:normal;font-size:11px;color:var(--ink-3);font-weight:400}
+.pv-more{padding:0 22px 20px;font-size:12.5px;color:var(--ink-3)}
+.pv-open{display:inline-flex;align-items:center;gap:7px;margin-top:16px;
+  padding:12px 22px;border-radius:999px;background:var(--paper);color:var(--ink);
+  text-decoration:none;font-size:14px;border:1px solid var(--oat);box-shadow:var(--sh-soft)}
+.pv-open:hover{transform:rotate(-1.2deg) translateY(-2px);box-shadow:var(--sh-lift)}
+.pv-open svg{flex:none}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--oat);margin-top:60px;padding:34px 0 54px;
+  color:var(--ink-3);font-size:13px;line-height:1.9}
+footer b{color:var(--ink-2);font-weight:500}
+
+@media (max-width:920px){
+  .hero-grid{grid-template-columns:1fr;gap:28px}
+  .art{min-height:250px;order:-1}
+  /* Scale the backdrop with the box, otherwise the fixed-width circles
+     overflow the narrower column. */
+  .art .blob{width:230px;height:230px}
+  .art .ring{width:256px;height:256px}
+  .stats,.cards,.steps{grid-template-columns:repeat(2,1fr)}
+  .finding{padding:32px 28px}
+}
+@media (max-width:560px){
+  .stats,.cards,.steps{grid-template-columns:1fr}
+  .nav .chip{display:none}
+  .nav a{padding:7px 11px;font-size:13px}
+  .finding{padding:26px 22px}
+  .pv-hero{padding:20px 20px 22px}
+  .pv-list,.pv-more{padding-left:18px;padding-right:18px}
+  .pv-row .pt{display:none}
+  /* Tilt on hover reads as jitter on touch devices. */
+  .card:hover,.btn-p:hover,.btn-s:hover{transform:translateY(-4px)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav">
+  <div class="mark">
+    <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M7 37V21a5.5 5.5 0 0 1 11 0v16" fill="none" stroke="#DA291C" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M22 37V21a5.5 5.5 0 0 1 11 0v16" fill="none" stroke="#DA291C" stroke-width="6.5" stroke-linecap="round"/>
+    </svg>
+    麦麦积分清算局
+  </div>
+  <div class="spacer"></div>
+  <span class="chip">2026 麦当劳创意开发大赛</span>
+</nav>
+
+<header class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">
+        <svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="#FFC72C"/><path d="M10 5.5v5.2l3.4 2" stroke="#7A4E00" stroke-width="1.9" fill="none" stroke-linecap="round"/></svg>
+        基于麦当劳官方 MCP 实时数据
+      </div>
+      <h1>你的麦麦积分，<br>正在<span class="hl">悄悄蒸发</span></h1>
+      <p class="lede">
+        积分过期是第一次损耗，换来的券没用掉是第二次。
+        清算局把「积分」和「人民币」放在<b>同一把尺子</b>上量 ——
+        告诉你还剩多少、换什么最值、抽奖到底划不划算。
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-p" href="#start">
+          <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          三分钟跑一次
+        </a>
+        <a class="btn btn-s" href="#preview">看看报告长什么样</a>
+      </div>
+      <p class="meta">零依赖 · 只读不出单 · <code>python points_rescue.py --setup</code></p>
+    </div>
+
+    <div class="art" aria-hidden="true">
+      <div class="blob"></div>
+      <div class="ring"></div>
+      <svg width="330" height="330" viewBox="0 0 330 330" fill="none">
+        <!-- burger -->
+        <g class="float" transform="translate(52 46)">
+          <ellipse cx="70" cy="144" rx="66" ry="12" fill="#231F1A" opacity=".08"/>
+          <path d="M8 66c0-32 30-56 62-56s62 24 62 56z" fill="#F0A93A"/>
+          <path d="M14 74c0-28 26-48 56-48s56 20 56 48z" fill="#FFC72C"/>
+          <rect x="6" y="76" width="128" height="17" rx="8.5" fill="#8FB03E"/>
+          <rect x="10" y="91" width="120" height="15" rx="7.5" fill="#DA291C"/>
+          <path d="M8 118h124c0 15-28 27-62 27S8 133 8 118z" fill="#E8A33D"/>
+          <circle cx="46" cy="42" r="3" fill="#fff" opacity=".85"/>
+          <circle cx="86" cy="34" r="2.6" fill="#fff" opacity=".85"/>
+          <circle cx="108" cy="52" r="2.2" fill="#fff" opacity=".85"/>
+        </g>
+        <!-- fries -->
+        <g class="float-2" transform="translate(196 128)">
+          <ellipse cx="52" cy="150" rx="52" ry="10" fill="#231F1A" opacity=".08"/>
+          <path d="M14 66h76l-9 78a8 8 0 0 1-8 7H31a8 8 0 0 1-8-7z" fill="#DA291C"/>
+          <path d="M20 74h64l-8 68a6 6 0 0 1-6 5H34a6 6 0 0 1-6-5z" fill="#F05A4C"/>
+          <rect x="30" y="30" width="13" height="46" rx="6" fill="#FFC72C"/>
+          <rect x="48" y="20" width="13" height="56" rx="6" fill="#FFD764"/>
+          <rect x="66" y="32" width="13" height="44" rx="6" fill="#FFC72C"/>
+          <path d="M52 14l7-9 7 9z" fill="#FFF0B8"/>
+        </g>
+        <!-- cone -->
+        <g class="float-3" transform="translate(22 196)">
+          <ellipse cx="46" cy="98" rx="40" ry="8" fill="#231F1A" opacity=".08"/>
+          <circle cx="30" cy="24" r="19" fill="#FFF6E2"/>
+          <circle cx="60" cy="18" r="16" fill="#FFFBF0"/>
+          <circle cx="45" cy="10" r="14" fill="#fff"/>
+          <path d="M14 40h64L45 96z" fill="#E8A33D"/>
+          <path d="M14 40h64l-6 12H20z" fill="#F0B95C"/>
+        </g>
+        <!-- coin -->
+        <g class="float" transform="translate(238 42)">
+          <ellipse cx="34" cy="72" rx="32" ry="8" fill="#231F1A" opacity=".08"/>
+          <circle cx="34" cy="36" r="32" fill="#FFC72C"/>
+          <circle cx="34" cy="32" r="28" fill="#FFD764"/>
+          <path d="M22 44V22l10 12 10-12v22" stroke="#A81E14" stroke-width="5.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+        <!-- sparkles -->
+        <path class="float-2" d="M170 22l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#FFC72C"/>
+        <path class="float-3" d="M300 150l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#DA291C"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat hot">
+      <div class="cap">历史蒸发率</div>
+      <div class="big">44<small>%</small></div>
+      <div class="note">累计 5,358 分，其中 2,355 分已过期清零</div>
+    </div>
+    <div class="stat">
+      <div class="cap">估值覆盖率</div>
+      <div class="big">71<small>%</small></div>
+      <div class="note">24 件可兑换券，17 件算出真实价差</div>
+    </div>
+    <div class="stat">
+      <div class="cap">券兑现率</div>
+      <div class="big">20<small>%</small></div>
+      <div class="note">历史 6 张券，6 张最后没用掉</div>
+    </div>
+    <div class="stat">
+      <div class="cap">抽奖 vs 兑换（元/百分）</div>
+      <div class="big cmp">2.91<small> vs 8.40</small></div>
+      <div class="note">元/100 积分 —— 所以结论是：别抽奖</div>
+    </div>
+  </div>
+</header>
+
+<section class="blk" id="why">
+  <div class="kicker">Why</div>
+  <h2>积分不是余额，是一笔<br>正在融化的资产</h2>
+  <p class="sub2">
+    和其他「省钱助手」不同，清算局不关心你这一单怎么点更便宜 ——
+    它关心的是账户里<b>这笔已经存在的积分</b>，怎么处置才能少亏一点。
+    解决它的办法只有一个：先给出一个所有人都能比较的单位。
+  </p>
+
+  <div class="finding">
+    <div class="q">「最划算的不是最贵的：<em>50 分</em>的券，效率是 <em>800 分</em>券的 <em>2.3 倍</em>。」</div>
+    <div class="src">真实账号测算 · 麦当劳 MCP 实时菜单价格推导</div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="ic ic-red">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16 6v20M16 26l-7-7M16 26l7-7" stroke="#DA291C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 6h20" stroke="#DA291C" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </div>
+      <h3>过期体检</h3>
+      <p>累计、已用、已过期、本月到期全部拆开。第一个跳出来的数字通常是「你有多少积分已经蒸发了」。</p>
+      <span class="tagx">损耗率</span>
+    </div>
+    <div class="card">
+      <div class="ic ic-gold">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M5 24l7-9 5 6 4-5 6 8z" fill="#E8A33D"/><circle cx="21" cy="9" r="4.5" fill="#FFC72C"/></svg>
+      </div>
+      <h3>兑换排行</h3>
+      <p>每张券折成「每 100 积分换回多少钱」再排序。商城能换的全是折扣券，所以收益是价差，不是面价。</p>
+      <span class="tagx">元 / 100 积分</span>
+    </div>
+    <div class="card">
+      <div class="ic ic-matcha">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="6" y="13" width="20" height="14" rx="4" fill="#8FB03E"/><path d="M11 13V9a5 5 0 0 1 10 0v4" stroke="#5F7A26" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <h3>清仓求解</h3>
+      <p>给定本月到期分，用完全背包算出「省得最多」的组合。不是按效率贪心 —— 那样会浪费零头。</p>
+      <span class="tagx">背包最优</span>
+    </div>
+    <div class="card">
+      <div class="ic ic-slush">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="#4FB3C9" stroke-width="2.6"/><path d="M16 9v7l5 3" stroke="#4FB3C9" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </div>
+      <h3>抽奖测算</h3>
+      <p>奖池每张券先按菜单价估值，再按概率求期望。官方不公布概率，就给出三种假设的区间而不是一个假精确的数。</p>
+      <span class="tagx">期望值 EV</span>
+    </div>
+    <div class="card">
+      <div class="ic ic-pink">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9 27V13M16 27V8M23 27v-9" stroke="#D4537E" stroke-width="3.4" stroke-linecap="round"/><path d="M5 27h22" stroke="#D4537E" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </div>
+      <h3>二次损耗</h3>
+      <p>换来的券没用掉，等于积分白花。用你的历史中奖记录算出兑现率，再折算抽奖的真实期望。</p>
+      <span class="tagx">兑现率</span>
+    </div>
+    <div class="card">
+      <div class="ic ic-oat">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="#8B8378" stroke-width="2.6"/><path d="M11 16l4 4 7-8" stroke="#8B8378" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>分期与个性化</h3>
+      <p>余额分成「本月必须花」和「可以攒」两层；再按你的历史订单给每张券打契合度 —— 不爱吃的，价值打折。</p>
+      <span class="tagx">攒单 · 契合度</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="start">
+  <div class="kicker">Start</div>
+  <h2>三步跑完，你自己的那份</h2>
+  <p class="sub2">
+    麦当劳 MCP 的登录是手机号 + 短信验证码 —— 那是你的真实身份凭证。
+    所以清算局<b>不做登录系统</b>：你自己拿 Token，它只负责引导、保管和使用，全程不出本机。
+  </p>
+  <div class="steps">
+    <div class="step">
+      <h4>配置一次</h4>
+      <p>运行 <code>--setup</code>，它会告诉你去哪点、拿什么。Token 存本机并收紧权限，不写入仓库、不上传。</p>
+    </div>
+    <div class="step">
+      <h4>自检一遍</h4>
+      <p><code>--doctor</code> 逐项确认：Token、连接、账户、券池、抽奖、历史订单、门店。哪里不通直接说。</p>
+    </div>
+    <div class="step">
+      <h4>出报告</h4>
+      <p><code>--live --city 你的城市</code>。生成单文件 HTML，也可以导出 Markdown 清单直接照着操作。</p>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="preview">
+  <div class="kicker">Report</div>
+  <h2>报告长什么样</h2>
+  <p class="sub2">
+    分层呈现：第一屏是一句话结论和积分健康分，往下是趣味事实，再往下才到排行和拆解。
+    术语没有消失，只是排到了后面，并且都配了人话解释。
+  </p>
+  <div class="preview">
+    <div class="pv">
+      <div class="pv-bar">
+        <i></i><i></i><i></i><span>麦麦积分清算局 · 积分体检报告</span>
+      </div>
+      <div class="pv-hero">
+        <div class="t">麦麦积分清算局</div>
+        <div class="q">你的积分里 <b>44%</b> 已经悄悄过期了，<br>这次能救回 <b>¥12.6</b>。</div>
+      </div>
+      <div class="pv-mid">
+        <div class="pv-ring"><div><div class="n">58</div><div class="c">健康分</div></div></div>
+        <div class="pv-score">
+          <div class="g">随缘型选手</div>
+          <div class="d">历史损耗 44%　−18　·　券兑现率 20%　−24</div>
+        </div>
+      </div>
+      <div class="pv-list">
+        <div class="pv-row"><span class="r1">1</span><span class="ph"></span>
+          <span class="nm">18.8元麦辣鸡腿汉堡两件套</span>
+          <span class="pt">50 分</span><span class="vv">8.40 <em>元/百分</em></span></div>
+        <div class="pv-row"><span class="r1">2</span><span class="ph"></span>
+          <span class="nm">22.8元2份麦辣鸡腿堡</span>
+          <span class="pt">500 分</span><span class="vv">7.04 <em>元/百分</em></span></div>
+        <div class="pv-row"><span class="r1">3</span><span class="ph"></span>
+          <span class="nm">22.9元2份麦辣鸡腿堡</span>
+          <span class="pt">500 分</span><span class="vv">7.02 <em>元/百分</em></span></div>
+      </div>
+      <div class="pv-more">还有清仓方案、抽奖三情景拆解、分期与个性化……</div>
+    </div>
+  </div>
+  <a class="pv-open" href="../docs/sample-report.html" target="_blank" rel="noopener">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M8 5h7v7M15 5L6 14" stroke="#231F1A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    打开完整报告（新窗口）
+  </a>
+</section>
+
+<footer>
+  <b>麦麦积分清算局 · mcd-points-rescue</b><br>
+  第三方独立作品，与麦当劳中国（金拱门（中国）有限公司）无隶属或背书关系。<br>
+  所有估值基于麦当劳 MCP 返回的实时菜单价格推导，仅供参考；实际积分、库存与活动状态以麦当劳官方 App 为准。<br>
+  本项目只读，不执行任何下单、兑换或抽奖操作。
+</footer>
+
+</div>
+</body>
+</html>

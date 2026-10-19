@@ -1,0 +1,32 @@
+# 环境变量与真实凭证 —— 绝不入库
+# 注意：不要用 *credential* 这类通配，它会把 src/credentials.py 源码一起排除，
+# 导致仓库缺失模块、别人 clone 后直接 ImportError。只匹配真正的凭证文件名。
+.env
+.env.*
+*.token
+token.txt
+credentials.json
+credentials.txt
+secrets.json
+
+# MCP 原始返回，可能包含真实账户数据
+raw.json
+
+# 运行产物（样例报告例外，需入库）
+out.json
+result.json
+report.html
+!docs/sample-report.html
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>麦麦积分清算局 · 本机配置</title>
+<style>
+:root{
+  --cream:#FCFAF4;--paper:#FFFFFF;--oat:#EDE6D8;--oat-2:#F5F0E6;
+  --ink:#231F1A;--ink-2:#5C554B;--ink-3:#8B8378;
+  --red:#DA291C;--red-dk:#A81E14;--gold:#FFC72C;--gold-lt:#FFE9A8;
+  --matcha:#8FB03E;
+  --sh:0 1px 1px rgba(35,31,26,.04),0 10px 28px rgba(35,31,26,.06),
+    inset 0 -1px 0 rgba(35,31,26,.03);
+  --sh-l:0 2px 2px rgba(35,31,26,.05),0 18px 40px rgba(35,31,26,.10),
+    inset 0 -1px 0 rgba(35,31,26,.03);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px 60px}
+.nav{padding:22px 0;display:flex;align-items:center;gap:11px}
+.nav .b{font-weight:500;letter-spacing:-.2px}
+.nav .sp{flex:1}
+.nav .loc{font-size:12px;color:var(--ink-3);background:var(--oat-2);
+  padding:6px 13px;border-radius:999px}
+
+h1{font-size:clamp(28px,4.4vw,44px);letter-spacing:-1.8px;line-height:1.12;font-weight:600;margin:14px 0 12px}
+.lede{font-size:16.5px;color:var(--ink-2);max-width:34em;line-height:1.7}
+.lede b{color:var(--ink);font-weight:600}
+
+.box{background:var(--paper);border:1px solid var(--oat);border-radius:30px;
+  padding:28px 28px 26px;box-shadow:var(--sh);margin-top:26px}
+.box h2{font-size:17px;font-weight:600;letter-spacing:-.4px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.box h2 .n{width:26px;height:26px;border-radius:9px;background:var(--gold);color:#5A3E00;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex:none}
+.box p{font-size:14.5px;color:var(--ink-2);line-height:1.68}
+
+ol.steps{margin:10px 0 0;padding-left:20px;font-size:14.5px;color:var(--ink-2)}
+ol.steps li{margin-bottom:6px}
+ol.steps b{color:var(--ink)}
+
+.btn{display:inline-flex;align-items:center;gap:9px;padding:15px 26px;border-radius:999px;
+  font-size:15px;font-weight:500;text-decoration:none;border:1px solid transparent;cursor:pointer;
+  font-family:inherit;transition:transform .22s cubic-bezier(.34,1.4,.64,1),box-shadow .22s,background .18s}
+.btn-p{background:var(--red);color:#fff;box-shadow:6px 6px 0 rgba(35,31,26,.14)}
+.btn-p:hover{transform:rotate(-2deg) translateY(-3px);box-shadow:9px 10px 0 rgba(35,31,26,.16)}
+.btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:6px 6px 0 rgba(35,31,26,.14)}
+.btn-s{background:var(--paper);color:var(--ink);border-color:var(--oat);box-shadow:var(--sh)}
+.btn-s:hover{transform:rotate(-1.5deg) translateY(-3px);box-shadow:var(--sh-l)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
+
+input[type=password]{flex:1;min-width:260px;padding:15px 18px;border-radius:16px;border:1px solid var(--oat);
+  background:var(--cream);font-size:14px;font-family:inherit;color:var(--ink)}
+input[type=password]:focus{outline:none;border-color:var(--gold);background:#fff}
+
+.status{margin-top:16px;font-size:13.5px;padding:13px 16px;border-radius:14px;display:none}
+.status.ok{display:block;background:#EEF5E1;color:#3B6D11;border:1px solid #C0DD97}
+.status.err{display:block;background:#FDECEA;color:#A32D2D;border:1px solid #F7C1C1}
+.status.info{display:block;background:var(--oat-2);color:var(--ink-2)}
+
+.why{margin-top:16px;font-size:12.5px;color:var(--ink-3);line-height:1.7;
+  border-top:1px dashed var(--oat);padding-top:14px}
+.why b{color:var(--ink-2)}
+
+.res{margin-top:26px;display:none}
+.res .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.res .c{background:var(--paper);border:1px solid var(--oat);border-radius:20px;padding:18px 16px;box-shadow:var(--sh)}
+.res .c .k{font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
+.res .c .v{font-size:26px;font-weight:600;letter-spacing:-1.2px;line-height:1}
+.res .c .v small{font-size:12px;font-weight:500}
+.res .c .n2{font-size:11.5px;color:var(--ink-2);margin-top:7px;line-height:1.5}
+.res .c.hot .v{color:var(--red)}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+footer{margin-top:40px;font-size:12px;color:var(--ink-3);line-height:1.85}
+@media (max-width:640px){.res .grid{grid-template-columns:repeat(2,1fr)}.box{padding:24px 20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav">
+  <svg width="28" height="28" viewBox="0 0 40 40" aria-hidden="true">
+    <path d="M7 37V21a5.5 5.5 0 0 1 11 0v16" fill="none" stroke="#DA291C" stroke-width="6.5" stroke-linecap="round"/>
+    <path d="M22 37V21a5.5 5.5 0 0 1 11 0v16" fill="none" stroke="#DA291C" stroke-width="6.5" stroke-linecap="round"/>
+  </svg>
+  <span class="b">麦麦积分清算局</span>
+  <span class="sp"></span>
+  <span class="loc">仅运行于本机 127.0.0.1</span>
+</nav>
+
+<h1>三步接上你的积分</h1>
+<p class="lede">
+  麦当劳 MCP 的登录是<b>手机号 + 短信验证码</b> —— 那一步必须发生在麦当劳自己的页面上，
+  这是凭证安全的底线。剩下的三步，全部在这页完成。
+</p>
+
+<div class="box">
+  <h2><span class="n">1</span>去官网拿 Token</h2>
+  <p>点下面的按钮会在<b>新窗口</b>打开麦当劳官方 MCP 平台。请确认地址栏是 <b>open.mcd.cn</b>，然后按页面提示操作。</p>
+  <ol class="steps">
+    <li>右上角 <b>登录</b> → 用手机号完成短信验证</li>
+    <li>右上角 <b>控制台</b></li>
+    <li>点 <b>激活</b>，同意服务协议</li>
+    <li>复制生成的 Token</li>
+  </ol>
+  <div class="row">
+    <a class="btn btn-p" href="https://open.mcd.cn/mcp" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M8 5h7v7M15 5L6 14" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      打开 open.mcd.cn（新窗口）
+    </a>
+  </div>
+  <div class="why">
+    <b>为什么不做成页面内直接登录？</b><br>
+    在第三方页面里让用户输入麦当劳账号的手机号和短信验证码，形态上与钓鱼页面无法区分 ——
+    用户无从确认验证码交给了谁。所以这一步刻意留在官网：你能在地址栏验证域名，
+    而本页只负责接收你自愿粘贴回来的 Token。
+  </div>
+</div>
+
+<div class="box">
+  <h2><span class="n">2</span>粘贴回来</h2>
+  <p>Token 会保存在你本机，权限收紧为仅本人可读写，不会写入仓库，也不会发送到任何地方。</p>
+  <div class="row">
+    <input type="password" id="tk" placeholder="在这里粘贴 Token" autocomplete="off" spellcheck="false">
+    <button class="btn btn-s" id="save">保存</button>
+  </div>
+  <div class="status" id="st"></div>
+</div>
+
+<div class="box">
+  <h2><span class="n">3</span>跑一次分析</h2>
+  <p>会实时读取你的积分、商城券池、抽奖活动、历史订单，并按你所在城市的门店菜单价格做估值。</p>
+  <div class="row">
+    <input type="password" id="city" placeholder="城市（如 上海市）" value="上海市"
+      style="flex:0 1 200px;min-width:180px">
+    <button class="btn btn-p" id="run">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M11 5l5 5-5 5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      开始分析
+    </button>
+  </div>
+  <div class="status" id="st2"></div>
+
+  <div class="res" id="res">
+    <h2 style="margin-top:6px">结果</h2>
+    <div class="grid">
+      <div class="c hot"><div class="k">历史蒸发</div><div class="v" id="r1">—</div><div class="n2" id="r1n"></div></div>
+      <div class="c"><div class="k">本月到期</div><div class="v" id="r2">—</div><div class="n2" id="r2n"></div></div>
+      <div class="c"><div class="k">最优兑换效率</div><div class="v" id="r3">—</div><div class="n2" id="r3n"></div></div>
+      <div class="c"><div class="k">抽奖结论</div><div class="v" id="r4" style="font-size:18px">—</div><div class="n2" id="r4n"></div></div>
+    </div>
+    <div class="row">
+      <a class="btn btn-s" id="open" href="#" target="_blank">打开完整报告</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Token 存储位置：<span id="fp">—</span><br>
+  本服务只监听 127.0.0.1，不对外暴露；页面关闭后可用 <code>--forget</code> 清除本地 Token。
+</footer>
+
+</div>
+
+<script>
+const $ = i => document.getElementById(i);
+
+async function api(path, body){
+  const r = await fetch(path, body ? {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+  } : {method:'GET'});
+  return await r.json();
+}
+function show(id, msg, kind){
+  const el = $(id); el.textContent = msg; el.className = 'status ' + kind;
+}
+
+$('save').onclick = async () => {
+  const v = $('tk').value.trim();
+  if (!v) return show('st','先粘贴 Token','err');
+  const r = await api('/api/token', {token:v});
+  show('st', r.ok ? '已保存到 ' + r.path + (r.restricted ? '（权限已收紧）' : '（权限收紧未生效）')
+                  : (r.error || '保存失败'), r.ok ? 'ok' : 'err');
+  if (r.ok) $('tk').value = '';
+};
+
+$('run').onclick = async () => {
+  const b = $('run'); b.disabled = true;
+  b.innerHTML = '<span class="spin"></span> 正在读取…';
+  show('st2','正在调用麦当劳 MCP，大约需要几秒','info');
+  try{
+    const r = await api('/api/analyze', {city: $('city').value.trim() || '上海市'});
+    if (!r.ok) throw new Error(r.error || '分析失败');
+    const a = r.data;
+    const acc = a.account || {};
+    const lost = acc.lost_ratio;
+    $('r1').innerHTML = lost != null ? Math.round(lost*100) + '<small>%</small>' : '—';
+    $('r1n').textContent = acc.accumulated ? ('累计 ' + acc.accumulated.toLocaleString() + ' 分，已过期 ' + (acc.expired_total||0).toLocaleString() + ' 分') : '';
+    $('r2').innerHTML = acc.expiring_this_month != null ? acc.expiring_this_month.toLocaleString() + '<small> 分</small>' : '—';
+    $('r2n').textContent = '可用 ' + (acc.available!=null?acc.available.toLocaleString():'—') + ' 分';
+    $('r3').innerHTML = a.best_ppv != null ? a.best_ppv.toFixed(2) + '<small> 元/百分</small>' : '—';
+    $('r3n').textContent = '覆盖 ' + (a.coverage ? a.coverage[0]+'/'+a.coverage[1] : '—');
+    const v = a.verdict || {};
+    $('r4').textContent = ({draw:'建议抽奖',redeem:'别抽奖，直接兑换',coin_flip:'看风险偏好',unknown:'数据不足'})[v.decision] || '—';
+    $('r4n').textContent = (a.lottery && a.lottery.ppv) ? ('中性 ' + (a.lottery.ppv.realistic||0).toFixed(2) + ' 元/百分') : '';
+    $('open').href = r.report_url || '#';
+    $('res').style.display = 'block';
+    show('st2','完成','ok');
+    $('res').scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    show('st2', '失败：' + e.message, 'err');
+  }finally{
+    b.disabled = false;
+    b.innerHTML = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M11 5l5 5-5 5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> 开始分析';
+  }
+};
+
+api('/api/status').then(r => {
+  if (r.path) $('fp').textContent = r.path;
+  if (r.configured) show('st', '已检测到保存过的 Token（' + r.source + '），可直接开始分析', 'ok');
+});
+</script>
+</body>
+</html>

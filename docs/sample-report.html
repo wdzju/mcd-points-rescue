@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>麦麦积分清算局 · 积分体检报告</title><style>
+:root{
+  --mcd-red:#DA291C; --mcd-red-dk:#A81E14; --mcd-yellow:#FFC72C; --mcd-cream:#FFF4DC;
+  --good:#0B7A4B; --warn:#B25A00; --bad:#C0392B; --info:#1D6FA5;
+  --bg:#FFFBF5; --card:#FFFFFF; --ink:#1F1B16; --muted:#7A6F62;
+  --line:#EDE3D6; --soft:#FDF7EF;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.6;padding:0 16px 32px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto}
+
+.hero{background:var(--mcd-red);border-radius:0 0 28px 28px;padding:26px 30px 30px;margin:0 -16px 22px;
+  color:#fff;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-70px;top:-46px;width:210px;height:210px;
+  border-radius:50%;background:var(--mcd-yellow);opacity:.16}
+.hero-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative}
+.arch{width:34px;height:34px;flex:none}
+.hero-top .brand{font-size:15px;font-weight:500;letter-spacing:.3px;opacity:.95}
+.hero-top .who{margin-left:auto;font-size:11.5px;opacity:.8;text-align:right;line-height:1.5}
+.hero-lead{font-size:25px;font-weight:500;line-height:1.45;letter-spacing:-.4px;position:relative;
+  max-width:660px}
+.hero-lead b{color:var(--mcd-yellow)}
+.hero-sub{margin-top:10px;font-size:13px;opacity:.9;position:relative}
+
+.scorewrap{display:flex;gap:18px;align-items:center;background:var(--card);
+  border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:18px}
+.ring{width:96px;height:96px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .txt{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center}
+.ring .num{font-size:27px;font-weight:500;line-height:1;letter-spacing:-1px}
+.ring .cap{font-size:10px;color:var(--muted);margin-top:2px}
+.scoreinfo{flex:1;min-width:0}
+.scoreinfo .grade{font-size:19px;font-weight:500;margin-bottom:3px}
+.scoreinfo .cmt{font-size:13px;color:var(--muted);margin-bottom:8px}
+.scoreinfo .drv{font-size:11.5px;color:var(--muted);line-height:1.7}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:18px}
+.fact{background:var(--mcd-cream);border:1px solid #F2E0B8;border-radius:14px;padding:15px 16px;
+  font-size:13.5px;line-height:1.65}
+.fact:before{content:"";display:block;width:22px;height:3px;border-radius:2px;
+  background:var(--mcd-red);margin-bottom:9px}
+.fact b{color:var(--mcd-red-dk)}
+
+/* These rules were lost when a stale-CSS cleanup over-deleted: without them
+   the alerts and metric cards render as bare text below the hero. */
+.alert{border-radius:14px;padding:18px 20px;margin-bottom:16px;display:flex;gap:16px;align-items:center}
+.alert.red{background:linear-gradient(135deg,#FDECEA,#FFF6F5);border:1px solid #F5C6C0}
+.alert.amber{background:linear-gradient(135deg,#FFF8E7,#FFFDF6);border:1px solid #F3DFA8}
+.alert.blue{background:linear-gradient(135deg,#EAF3FA,#F7FCFF);border:1px solid #BBD9EF}
+.alert .big{font-size:32px;font-weight:800;line-height:1;letter-spacing:-1px;flex:none}
+.alert .txt{font-size:14px;color:#5A4A3F}
+.alert .txt b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px}
+.card .k{font-size:12px;color:var(--muted);margin-bottom:5px}
+.card .v{font-size:23px;font-weight:700;letter-spacing:-.5px}
+.card .v small{font-size:11.5px;font-weight:500;color:var(--muted)}
+.card .x{font-size:11px;color:var(--muted);margin-top:3px}
+
+section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:18px}
+h2{font-size:17px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+h2 .n{width:22px;height:22px;border-radius:6px;background:var(--mcd-yellow);color:#3B2C00;
+  font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+.note{color:var(--muted);font-size:12.5px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--soft);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.bar{height:7px;border-radius:4px;background:var(--soft);overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;border-radius:4px}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:20px;background:var(--soft);
+  color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.tag.exact{background:#EAF7F0;color:var(--good);border-color:#B6E2CB}
+.tag.est{background:#FFF8E7;color:var(--warn);border-color:#F3DFA8}
+.tag.mute{background:#F4F1EC;color:#9A8E80;border-color:#E5DED3}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.verdict{border-left:4px solid var(--mcd-red);padding:2px 0 2px 16px;margin:6px 0 14px}
+.verdict .lead{font-size:19px;font-weight:700;margin-bottom:6px}
+.verdict p{font-size:13.5px;color:#5A4A3F}
+.split{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.mini{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:13px}
+.scen{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.scen .s{border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.scen .s.main{border-color:var(--mcd-yellow);background:#FFFDF5}
+.scen .t{font-size:12px;color:var(--muted)}
+.scen .p{font-size:22px;font-weight:800;letter-spacing:-.5px;margin:3px 0}
+.scen .d{font-size:11px;color:var(--muted)}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:16px 0 4px;line-height:1.8}
+ul.warnlist{margin:12px 0 0;padding-left:18px;font-size:13px;color:#6B5B4C}
+ul.warnlist li{margin-bottom:5px}
+.ap{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ap-head{padding:12px 14px;background:var(--soft);font-size:13px;font-weight:500;border-bottom:1px solid var(--line)}
+.ap-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--soft);font-size:13px}
+.ap-row .ap-name{flex:1}
+.box-empty{width:14px;height:14px;border:1.5px solid #C9BFB2;border-radius:3px;flex:none}
+.ap-note{padding:10px 14px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--soft)}
+.ap-avoid{padding:11px 14px;font-size:12.5px;color:#8A2018;background:#FDF2F0}
+.ap-avoid:last-child{border-bottom:none}
+
+.prod{display:flex;align-items:center;gap:11px}
+.prod img{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:none;
+  background:var(--soft);border:1px solid var(--line)}
+.prod .ph{width:44px;height:44px;border-radius:10px;flex:none;background:var(--mcd-cream);
+  display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--mcd-red-dk)}
+.prod .nm{min-width:0}
+.prod .nm .sm{font-size:11px;color:var(--muted);margin-top:1px}
+.prize{display:flex;align-items:center;gap:9px}
+.prize img{width:30px;height:30px;border-radius:7px;object-fit:cover;flex:none;background:var(--soft)}
+.gloss{border-top:1px dashed var(--line);margin-top:14px;padding-top:12px}
+.gloss dt{font-size:12.5px;color:var(--ink);margin-top:7px}
+.gloss dd{font-size:12px;color:var(--muted);margin-left:0}
+@media (max-width:760px){.grid,.split,.scen{grid-template-columns:1fr 1fr}.hero-lead{font-size:21px}}
+</style></head>
+<body><div class="wrap">
+<div class="hero">
+  <div class="hero-top">
+    <svg class="arch" viewBox="0 0 40 40" aria-hidden="true"><path d="M6 38V20a6 6 0 0 1 12 0v18" fill="none" stroke="#FFC72C" stroke-width="6"/><path d="M22 38V20a6 6 0 0 1 12 0v18" fill="none" stroke="#FFC72C" stroke-width="6"/></svg><span class="brand">麦麦积分清算局</span>
+    <span class="who">2026-10-16 16:51:09<br>实时数据 · 麦当劳某门店（编码已隐藏）</span>
+  </div>
+  <div class="hero-lead">你的积分里 44% 已经悄悄过期了，这次能救回 ¥12.6。</div>
+  <div class="hero-sub">积分过期体检 · 兑换排行 · 抽奖测算 —— 数据来自麦当劳官方 MCP 实时接口</div>
+</div>
+<div class="scorewrap">
+  <div class="ring">
+    <svg width="96" height="96" viewBox="0 0 96 96">
+      <circle cx="48" cy="48" r="40" fill="none" stroke="#EDE3D6" stroke-width="9"/>
+      <circle cx="48" cy="48" r="40" fill="none" stroke="#DA291C" stroke-width="9"
+        stroke-linecap="round" stroke-dasharray="145.8 251.3"/>
+    </svg>
+    <div class="txt"><div class="num">58</div><div class="cap">积分健康分</div></div>
+  </div>
+  <div class="scoreinfo">
+    <div class="grade">随缘型选手</div>
+    <div class="cmt">想起来才用，大部分在随它去</div>
+    <div class="drv"><div>· 历史损耗 44%　−18 分</div><div>· 券兑现率 20%　−24 分</div></div>
+  </div>
+</div>
+<div class='facts'><div class='fact'>已经蒸发的 2,355 分，按现在的汇率约 ¥198，约 5 个吉士汉堡包套餐。</div><div class='fact'>这份方案能换回 ¥12.6，约 1.1 个100% 苹果汁(盒装)。</div><div class='fact'>你历史抽到/领到的 6 张券里，6 张最后没用掉 —— 这是第二次损耗。</div><div class='fact'>最划算的不是最贵的：18.8元麦辣鸡腿汉堡两件套 只要 50 分，效率却是 28.8元巨无霸四件套 的 2.2 倍。</div></div>
+<div class="alert red"><div class="big">44%</div>
+<div class="txt">你累计获得 <b>5,358.7</b> 分，其中
+<b>2,355.2 分已经过期清零</b>，实际用掉 2,447.0 分，
+现在还剩 <b>556.5</b> 分。</div></div><div class="alert red"><div class="big">本月</div>
+<div class="txt"><b>166 分本月到期</b>，按当前最优兑换效率折算约
+<b>¥13.9</b>。现在就安排掉，别留到明年。</div></div><div class="alert blue"><div class="big">抽奖</div>
+<div class="txt">活动 <b>麦麦积分抽奖</b> 单次消耗
+<b>24 分</b>，按当前余额可抽 <b>23</b> 次。官方未公布逐档概率，
+下方给出三种假设下的期望区间。</div></div>
+<div class="grid">
+  <div class="card"><div class="k">可用积分</div>
+    <div class="v">556.5<small> 分</small></div>
+    <div class="x">麦享会积分</div></div>
+  <div class="card"><div class="k">本月到期</div>
+    <div class="v">166<small> 分</small></div>
+    <div class="x">已清零 2,355 分</div></div>
+  <div class="card"><div class="k">商城最优效率</div>
+    <div class="v">8.40<small> 元/百分</small></div>
+    <div class="x">菜单 103 项作锚点</div></div>
+  <div class="card"><div class="k">抽奖期望效率</div>
+    <div class="v">2.95<small> 元/百分</small></div>
+    <div class="x">中性口径</div></div>
+</div>
+<section><h2><span class="n">1</span>抽奖 vs 直接兑换</h2>
+<p class="note">同一笔积分的两条出路，用期望值对齐后再比。</p>
+<div class="verdict"><div class="lead">结论：别抽奖，直接兑换</div><p>抽奖单次消耗 24 积分，中性口径收益期望 ¥0.71（2.95 元/百分）；商城最优档 8.40 元/百分。EV 区间 0.99 ~ 6.86 元/百分（悲观~乐观）。中性口径下抽奖不如直接兑换。</p></div>
+<p class="note">口径说明：官方未公布逐档中奖概率。主口径（realistic）由你自己的历史中奖记录收缩校准得出：弱证据（观测不足 5 次）（2 次观测）。optimistic 为均分假设上界，pessimistic 为三次幂衰减下界。</p></section>
+<section><h2><span class="n">3</span>二次损耗：换来的券，你用掉了吗</h2>
+<p class="note">积分过期是第一次损耗。换来的券没用掉，是第二次 —— 结果一样，积分没了。</p>
+<div class="alert" style="background:var(--soft);border:1px solid var(--line)">
+  <div class="big" style="color:var(--bad)">20%</div>
+  <div class="txt">历史 <b>6</b> 张券，用掉 <b>0</b> 张，
+  失效 <b>6</b> 张 —— 约 <b>80%</b> 的券价值从未兑现。
+  失效样例：麦旋风5折券、圆筒冰淇淋4折优惠券、二等奖：辣薯二件套
+  <br><span class="tag mute">历史 6 张券，用掉 0 张，兑现率 20%</span>
+  <span class="tag mute">置信度 high</span></div>
+</div>
+<ul class="warnlist">
+  <li>历史原始兑现率为 <b>0%</b>，已按 20% 下限调整 —— 完全归零会让任何建议都变成「什么都别做」，而这正是本报告要帮你改变的行为。</li>
+      <li>抽奖的奖品同样是券，因此奖池期望价值已按此兑现率折算。</li>
+      <li>商城券是<b>你主动兑换</b>的，使用意愿高于随机抽中的奖品，因此<b>不套用</b>这个失效率；
+          改为在排行中提示兑换截止时间。</li>
+      <li>统计口径只含<b>优惠券类</b>奖品；节气门票等非券类奖品不参与兑现率计算。</li>
+</ul></section>
+<section><h2><span class="n">2</span>兑换性价比排行</h2>
+<p class="note">单位 <b>元 / 100 积分</b>，越高越划算。
+「节省」是这张券实际替你省下的人民币 —— 这里的兑换物<b>全部是折扣券</b>，
+所以收益等于「原价比应付价格的差额」，而不是券面价格。<br>
+估值覆盖 <b>17/24</b>（71%），其中 9 件为估算值（同类目价格分布或单品加总）；
+未覆盖的会标注原因，不会用编造的数字凑数。</p>
+<table><thead><tr><th>#</th><th>兑换商品</th><th class="num">积分</th>
+<th class="num">节省</th><th class="num">元/百分</th><th>效率</th></tr></thead>
+<tbody><tr><td class='num'>1</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/477df186636af02f.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>18.8元麦辣鸡腿汉堡两件套</span></div></td><td class='num'>50</td><td class='num'>¥4.20</td><td class='num'><b>8.40</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 7.33 · 麦辣鸡腿汉堡</div></td><td><div class='bar'><i style='width:100%;background:linear-gradient(90deg,#DA291C,#FFC72C)'></i></div><div style='margin-top:4px'><span class='tag exact'>菜单模糊匹配</span></div></td></tr><tr><td class='num'>2</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/4bc13cf4af30f753.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>22.8元2份麦辣鸡腿堡</span></div></td><td class='num'>500</td><td class='num'>¥35.20</td><td class='num'><b>7.04</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 5.86 · 麦辣鸡腿堡四件套</div></td><td><div class='bar'><i style='width:83%;background:linear-gradient(90deg,#E08A2B,#FFC72C)'></i></div><div style='margin-top:4px'><span class='tag exact'>菜单模糊匹配</span></div></td></tr><tr><td class='num'>3</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/283899b2d2548c51.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>22.9元2份麦辣鸡腿堡</span></div></td><td class='num'>500</td><td class='num'>¥35.10</td><td class='num'><b>7.02</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 5.84 · 麦辣鸡腿堡四件套</div></td><td><div class='bar'><i style='width:83%;background:linear-gradient(90deg,#E08A2B,#FFC72C)'></i></div><div style='margin-top:4px'><span class='tag exact'>菜单模糊匹配</span></div></td></tr><tr><td class='num'>4</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/b2c98e893600e58c.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>5.9元香芋派/菠萝派任选</span></div></td><td class='num'>50</td><td class='num'>¥2.60</td><td class='num'><b>5.20</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 4.32 · 香芋派</div></td><td><div class='bar'><i style='width:61%;background:linear-gradient(90deg,#E08A2B,#FFC72C)'></i></div><div style='margin-top:4px'><span class='tag est'>单品加总估算</span></div></td></tr><tr><td class='num'>5</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/1d1e9623aa2604ac.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>18.8元2份麦辣鸡翅</span></div></td><td class='num'>200</td><td class='num'>¥10.20</td><td class='num'><b>5.10</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 4.42 · 麦辣鸡翅2块</div></td><td><div class='bar'><i style='width:60%;background:linear-gradient(90deg,#E08A2B,#FFC72C)'></i></div><div style='margin-top:4px'><span class='tag exact'>菜单精确匹配</span></div></td></tr><tr><td class='num'>6</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/eafe418b3ef14f18.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>22.9元2份板烧鸡腿堡</span></div></td><td class='num'>500</td><td class='num'>¥25.10</td><td class='num'><b>5.02</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 3.01 · 未见于历史订单</div></td><td><div class='bar'><i style='width:59%;background:linear-gradient(90deg,#E08A2B,#FFC72C)'></i></div><div style='margin-top:4px'><span class='tag exact'>菜单精确匹配</span></div></td></tr><tr><td class='num'>7</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/91b5dd144893df95.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>9.9元指定小食任选</span></div></td><td class='num'>100</td><td class='num'>¥4.80</td><td class='num'><b>4.80</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 2.88 · 未见于历史订单</div></td><td><div class='bar'><i style='width:57%;background:linear-gradient(90deg,#E08A2B,#FFC72C)'></i></div><div style='margin-top:4px'><span class='tag est'>同类目估算</span></div></td></tr><tr><td class='num'>8</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/88c68b4ee71245cb.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>24.8元2份板烧鸡腿堡</span></div></td><td class='num'>500</td><td class='num'>¥23.20</td><td class='num'><b>4.64</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 2.78 · 未见于历史订单</div></td><td><div class='bar'><i style='width:55%;background:linear-gradient(90deg,#E08A2B,#FFC72C)'></i></div><div style='margin-top:4px'><span class='tag exact'>菜单精确匹配</span></div></td></tr><tr><td class='num'>9</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/acd57835928c0f6f.jpg' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>10.9元指定小食任选</span></div></td><td class='num'>100</td><td class='num'>¥3.80</td><td class='num'><b>3.80</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 2.28 · 未见于历史订单</div></td><td><div class='bar'><i style='width:45%;background:linear-gradient(90deg,#C9BFB2,#E3DACE)'></i></div><div style='margin-top:4px'><span class='tag est'>同类目估算</span></div></td></tr><tr><td class='num'>10</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/fb8a906a54760b7e.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>28.8元巨无霸四件套</span></div></td><td class='num'>800</td><td class='num'>¥30.20</td><td class='num'><b>3.77</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 2.27 · 未见于历史订单</div></td><td><div class='bar'><i style='width:44%;background:linear-gradient(90deg,#C9BFB2,#E3DACE)'></i></div><div style='margin-top:4px'><span class='tag exact'>菜单精确匹配</span></div></td></tr><tr><td class='num'>11</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/38588effdbf01f2a.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>28.9元板烧四件套</span></div></td><td class='num'>800</td><td class='num'>¥29.10</td><td class='num'><b>3.64</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 2.18 · 未见于历史订单</div></td><td><div class='bar'><i style='width:43%;background:linear-gradient(90deg,#C9BFB2,#E3DACE)'></i></div><div style='margin-top:4px'><span class='tag exact'>菜单模糊匹配</span></div></td></tr><tr><td class='num'>12</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/c8e3a03b35f73ede.jpg' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>6.9元香芋派/菠萝派任选</span></div></td><td class='num'>50</td><td class='num'>¥1.60</td><td class='num'><b>3.20</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 2.66 · 香芋派</div></td><td><div class='bar'><i style='width:38%;background:linear-gradient(90deg,#C9BFB2,#E3DACE)'></i></div><div style='margin-top:4px'><span class='tag est'>单品加总估算</span></div></td></tr><tr><td class='num'>13</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/72a21fa0f800c4d7.jpg' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>10.9元指定小食任选</span></div></td><td class='num'>200</td><td class='num'>¥3.80</td><td class='num'><b>1.90</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 1.14 · 未见于历史订单</div></td><td><div class='bar'><i style='width:22%;background:linear-gradient(90deg,#C9BFB2,#E3DACE)'></i></div><div style='margin-top:4px'><span class='tag est'>同类目估算</span></div></td></tr><tr><td class='num'>14</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/bd4382429dc7c39c.jpg' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>21.9元巨无霸可乐组合</span></div></td><td class='num'>800</td><td class='num'>¥13.60</td><td class='num'><b>1.70</b><div style='font-size:11px;color:var(--muted);margin-top:2px'>为你 1.02 · 未见于历史订单</div></td><td><div class='bar'><i style='width:20%;background:linear-gradient(90deg,#C9BFB2,#E3DACE)'></i></div><div style='margin-top:4px'><span class='tag est'>单品加总估算</span></div></td></tr><tr><td class='num'>15</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/4e708872b8603c91.jpg' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>为随心配五大巨星“应援”1积分兑换活动</span></div></td><td class='num'>1</td><td class='num'>—</td><td class='num'>—</td><td><span class='tag mute'>菜单无对应餐品</span></td></tr><tr><td class='num'>16</td><td><div class='prod'><img src='https://img.mcd.cn/ecs/fc0f224cfbc0e738.png' alt='' loading='lazy' onerror="this.style.display='none'"><span class='nm'>18.8元板烧鸡腿堡两件套</span></div></td><td class='num'>100</td><td class='num'>—</td><td class='num'>—</td><td><span class='tag mute'>菜单无对应餐品</span></td></tr></tbody></table></section>
+<section><h2><span class="n">4</span>清仓方案与攒单建议</h2>
+<p class="note">预算 166 分，完全背包求解「总节省最大」的兑换组合。</p>
+<table><thead><tr><th>兑换商品</th><th class="num">数量</th><th class="num">单价(分)</th>
+<th class="num">小计(分)</th><th class="num">节省</th></tr></thead>
+<tbody><tr><td>18.8元麦辣鸡腿汉堡两件套</td><td class='num'>3</td><td class='num'>50</td><td class='num'>150</td><td class='num'>¥12.60</td></tr></tbody></table>
+<ul class="warnlist">
+  <li>合计消耗 <b>150</b> 分，预计节省 <b>¥12.60</b>。</li>
+  <li>剩余 <b>16</b> 分凑不成完整组合，可留到下月或搭配现金。</li>
+</ul>
+<div class='split' style='margin-top:16px'><div class='mini'><div class='k'>本月到期 · 必须花掉</div><div class='v'>,.0f 分</div></div><div class='mini'><div class='k'>其余 · 可以攒着</div><div class='v'>,.0f 分</div></div></div><p class='note' style='margin-top:12px'>166 分本月到期必须花掉，其余 390 分可以攒</p><p class='note' style='margin-top:12px'><b>没有值得攒的目标</b> —— 余额现在能换到的券，效率已经压过所有更高价位的券。不必为了「换大的」而攒分。</p>
+</section>
+<section><h2><span class="n">5</span>抽奖期望值拆解</h2>
+<p class="note">活动 <b>麦麦积分抽奖</b> ｜ 单次消耗
+<b>24</b> 分 ｜ 消耗积分抽奖 ｜
+已估值 <b>8</b>/<b>10</b> 项奖品</p>
+<div class="scen"><div class='s'><div class='t'>乐观 · 等概率</div><div class='p'>¥1.65</div><div class='d'>官方若近似均分<br>6.86 元/百分</div></div><div class='s main'><div class='t'>中性 · 幂律衰减</div><div class='p'>¥0.71</div><div class='d'>大奖越难中，主口径<br>2.95 元/百分</div></div><div class='s'><div class='t'>悲观 · 三次幂</div><div class='p'>¥0.24</div><div class='d'>大奖几乎抽不到<br>0.99 元/百分</div></div></div>
+<table><thead><tr><th>奖品</th><th class="num">中性概率</th>
+<th class="num">折算价值</th><th class="num">EV 贡献</th></tr></thead>
+<tbody><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/e74fa061787ebe92.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>板烧三件套5折券</span></div></td><td class='num'>2.05%</td><td class='num'>¥4.85</td><td class='num'>¥0.099</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/e74fa061787ebe92.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>麦辣三件套5折券</span></div></td><td class='num'>2.32%</td><td class='num'>¥4.75</td><td class='num'>¥0.110</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/6a840cacdc3ba372.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>双层鳕鱼三件套6折券</span></div></td><td class='num'>2.67%</td><td class='num'>¥3.88</td><td class='num'>¥0.104</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/9c0a2a5cf2791217.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>麦旋风5折券</span></div></td><td class='num'>13.14%</td><td class='num'>¥1.50</td><td class='num'>¥0.197</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/e74fa061787ebe92.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>甜辣小食组合5折券</span></div></td><td class='num'>3.78%</td><td class='num'><span class='tag mute'>无法估值</span></td><td class='num'>¥0.000</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/b0300a3c60adbb80.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>小食四件套5.5折券</span></div></td><td class='num'>4.70%</td><td class='num'><span class='tag mute'>无法估值</span></td><td class='num'>¥0.000</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/ce3b2ebc8f729b18.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>下单立减3元券</span></div></td><td class='num'>6.14%</td><td class='num'>¥0.60</td><td class='num'>¥0.037</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/05e92c61916ad743.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>下单立减2元券</span></div></td><td class='num'>8.67%</td><td class='num'>¥0.40</td><td class='num'>¥0.035</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/a09ad4c57399cd45.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>30积分</span></div></td><td class='num'>14.11%</td><td class='num'>¥0.29</td><td class='num'>¥0.041</td></tr><tr><td><div class='prize'><img src='https://img.mcd.cn/gallery/0c99483d7c138087.png' alt='' loading='lazy' onerror="this.style.display='none'"><span>下单立减1元券</span></div></td><td class='num'>42.42%</td><td class='num'>¥0.20</td><td class='num'>¥0.085</td></tr></tbody></table>
+<ul class="warnlist">
+  <li>EV = Σ p<sub>i</sub> × V<sub>i</sub>，V<sub>i</sub> 由菜单实时价格推导：
+      折扣券按「原价 × (1 − 折扣率)」，组合券按「原价合计 − 实际支付」。</li>
+  <li>官方未公布中奖概率，三种假设差异很大 —— <b>请按区间而非单点数字做判断</b>。</li>
+</ul></section>
+<section><h2><span class="n">6</span>我的中奖记录</h2>
+<p class="note">用于交叉验证上面的概率假设是否与实际手感吻合。</p>
+<table><thead><tr><th>奖品</th><th>类型</th><th>中奖时间</th><th>状态</th></tr></thead>
+<tbody><tr><td>处暑</td><td>门票</td><td>2026-09-03 18:08:11</td><td>可用</td></tr><tr><td>麦旋风5折券</td><td>优惠券</td><td>2026-09-03 18:07:14</td><td>已失效</td></tr><tr><td>圆筒冰淇淋4折优惠券</td><td>优惠券</td><td>2026-08-29 15:34:09</td><td>已失效</td></tr><tr><td>立春</td><td>门票</td><td>2026-02-17 13:38:30</td><td>可用</td></tr><tr><td>大寒</td><td>门票</td><td>2026-01-21 18:07:15</td><td>可用</td></tr><tr><td>小寒</td><td>门票</td><td>2026-01-12 18:15:26</td><td>可用</td></tr><tr><td>二等奖：辣薯二件套</td><td>优惠券</td><td>2025-12-06 17:43:38</td><td>已失效</td></tr><tr><td>二等奖：下单立减1元券</td><td>优惠券</td><td>2025-12-06 17:43:29</td><td>已失效</td></tr><tr><td>二等奖：不素之霸三件套</td><td>优惠券</td><td>2025-12-06 17:43:21</td><td>已失效</td></tr><tr><td>二等奖：麦辣鸡腿汉堡</td><td>优惠券</td><td>2025-12-06 17:43:12</td><td>已失效</td></tr></tbody></table></section>
+<section><h2><span class="n">7</span>行动清单</h2>
+<p class="note">照着做就行 —— 用 <code>--plan</code> 可以导出 Markdown 版本，
+直接贴进备忘录或提醒事项。</p>
+<div class="ap"><div class='ap-head'>可用 556.5 分，本月到期 166 分</div><div class='ap-row'><span class='box-empty'></span><span class='ap-name'>18.8元麦辣鸡腿汉堡两件套 × 3</span><span class='num'>150 分</span><span class='num'>省 ¥12.60</span></div><div class='ap-note'>共消耗 150 分，预计节省 ¥12.60；剩余 16 分凑不成整券，可留到下月</div><div class='ap-note'>换到的券记得用掉 —— 你历史 6 张券里 6 张最后失效了。</div><div class='ap-avoid'>别抽奖：折算兑现率后效率约 2.95 元/百分，低于直接兑换的 8.40 元/百分。</div></div></section>
+<section><h2><span class="n">!</span>运行提示</h2><ul class="warnlist"><li>奖池有 2 项无法估值，EV 为保守下界。</li><li>7 件商城商品仍未估值（名称无法解析到任何餐品或类目）</li><li>二次损耗：历史 6 张券中 6 张失效，兑现率 20% —— 抽奖奖品的期望价值已按此折算。</li></ul></section>
+<section><h2><span class="n">?</span>这些词是什么意思</h2>
+<dl class="gloss"><dt>元/百分</dt><dd>每 100 积分能换回多少人民币，越高越划算</dd><dt>期望值 EV</dt><dd>按概率算，平均一次能赚回多少</dd><dt>兑现率</dt><dd>你历史上拿到券以后，真正用掉的比例</dd><dt>二次损耗</dt><dd>积分过期是第一次，换来的券没用掉是第二次</dd><dt>清仓方案</dt><dd>在到期分预算内，能换回最多钱的组合</dd></dl></section>
+<footer>
+本工具为非官方第三方作品，与麦当劳中国无隶属关系。<br>
+所有估值基于麦当劳 MCP 返回的实时菜单价格推导，仅供参考；实际积分、库存与活动状态以麦当劳官方 App 为准。<br>
+本项目只读，不执行任何下单、兑换或抽奖操作。<br>
+mcd-points-rescue · 2026 麦当劳程序员创意开发大赛参赛作品
+</footer></div></body></html>
