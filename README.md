@@ -28,15 +28,39 @@
 
 ---
 
-## 三种人，三种用法
+## 想用？复制这一行，发给你的 AI
 
-| 你是谁 | 做什么 | 大概多久 |
-|---|---|---|
-| **只是路过**，想看看是啥 | 点上面的 **项目展示页**（需先开 GitHub Pages，见下方） | 10 秒 |
-| **想试试**，但不想弄 Token | `python points_rescue.py --demo` | 30 秒 |
-| **想用自己的数据** | `python points_rescue.py --web`，浏览器里三步走完 | 3 分钟 |
+```
+读一下 https://raw.githubusercontent.com/wdzju/mcd-points-rescue/main/SKILL-lite.md 然后按里面的流程帮我查麦当劳积分
+```
 
-前两种**不需要任何凭证、不需要联网、不需要 pip install** —— 纯 Python 标准库，克隆下来就能跑。
+就这样。**不用克隆、不用装 Python、不用敲任何命令。**
+
+AI 会自己去读那份说明，然后调用麦当劳接口、算出结果、用大白话讲给你听。
+
+**唯一的前提**：你的 AI 能连上麦当劳 MCP。在 WorkBuddy 里配一次就行 ——
+【专家·技能·连接器】→【连接器】→【自定义连接器】→【配置 MCP】，填入：
+
+```json
+{"mcpServers":{"mcd-mcp":{"type":"streamablehttp","url":"https://mcp.mcd.cn","headers":{"Authorization":"Bearer 你的Token"}}}}
+```
+
+Token 去 <https://open.mcd.cn/mcp> 免费申请（手机号验证，约 1 分钟），替换掉上面那串字。
+
+配好之后，上面那句话就能用了。**以后再问，直接说「帮我查麦当劳积分」就行**，
+不用再贴链接。
+
+---
+
+## 其他用法
+
+| 你是谁 | 做什么 |
+|---|---|
+| **只是想看看效果** | 点上面的 **项目展示页** |
+| **想把它变成常驻技能** | 一条 curl 装进 skills 目录，见 [轻量版安装](#先试轻量版一条命令装好不用克隆不用-python) |
+| **要精确计算 + HTML 报告** | 克隆仓库跑 Python，见 [完整版](#完整版克隆仓库生成-html-报告) |
+
+后两种是进阶用法。**大多数人只需要上面那一行字就够了。**
 
 > **看不到展示页？** GitHub 默认只显示 HTML 源码，不渲染页面。
 > 需要仓库主人开一次 Pages：`Settings → Pages → Source 选 Deploy from a branch → 分支 main、目录 / (root) → Save`。
