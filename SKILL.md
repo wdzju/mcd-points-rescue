@@ -9,6 +9,9 @@ description: |
   当用户问「我的麦麦积分还能干嘛」「积分什么时候过期」「抽奖划不划算」
   「麦麦商城换哪个最值」「把快过期的积分安排掉」时触发。
   用户还没配置 Token 也能用：本 Skill 内置引导流程，或用演示模式先看效果。
+description_zh: 麦当劳积分体检：算出过期蒸发了多少、换哪张券最值、抽奖划不划算
+description_en: Audit McDonald's points — expiry loss, coupon value ranking, lottery EV
+allowed-tools: Read,Write,Bash
 ---
 
 # 麦麦积分清算局
@@ -18,26 +21,28 @@ description: |
 **核心特性：没有任何前置配置也能启动。** 没 Token 时先跑演示模式给用户看效果，
 用户想跑真实数据时再引导他配置 —— 不要一上来就要凭证。
 
-## 执行流程
+---
 
+## 第 0 步：先确认运行环境
+
+```bash
+python --version
 ```
-用户触发
-   │
-   ├─ 第 0 步：检查 Token
-   │     ├─ 有  ──────────────┐
-   │     └─ 没有 → 第 1 步引导 │
-   │                          ↓
-   ├─ 第 2 步：自检（可选）   │
-   ├─ 第 3 步：跑分析 ←───────┘
-   ├─ 第 4 步：讲人话
-   └─ 第 5 步：落地提醒
-```
+
+- **Windows**：用 `python`；若提示找不到，改用 `py`
+- **macOS / Linux**：通常要用 `python3`
+
+下文所有命令以 `python` 示例，Mac/Linux 用户请自行替换为 `python3`。
+
+**如果用户没装 Python**：让他去 <https://www.python.org/downloads/> 装 3.9 或更高版本，
+勾选「Add Python to PATH」。**装的必要性要说清楚**：这个工具只用标准库，
+装完 Python 就能跑，不需要 `pip install` 任何东西。
 
 ---
 
-## 第 0 步：先检查有没有 Token
+## 第 1 步：检查 Token
 
-不要假设用户配好了。先跑这一条：
+不要假设用户配好了。先跑：
 
 ```bash
 python points_rescue.py --doctor
@@ -47,15 +52,15 @@ python points_rescue.py --doctor
 
 | 输出特征 | 含义 | 下一步 |
 |---|---|---|
-| `Token 已配置` | 可以跑真实数据 | 跳到第 2 步 |
-| `Token 缺失` | 还没配置 | 走第 1 步 |
-| `连接 失败` | Token 过期或格式错 | 走第 1 步，提示重新申请 |
+| `Token 已配置` | 可以跑真实数据 | 跳到第 3 步 |
+| `Token 缺失` | 还没配置 | 走第 2 步 |
+| `连接 失败` | Token 过期或格式错 | 走第 2 步，提示重新申请 |
 
 ---
 
-## 第 1 步：没有 Token 时的引导
+## 第 2 步：没有 Token 时的引导
 
-### 1.1 先给用户看效果（强烈建议）
+### 2.1 先给用户看效果
 
 别让用户先去折腾 Token —— **先跑演示模式，30 秒，零门槛**：
 
@@ -63,7 +68,7 @@ python points_rescue.py --doctor
 python points_rescue.py --demo
 ```
 
-**如果用户不熟命令行**，让他直接跑不带参数的命令，效果一样：
+如果用户不熟命令行，让他直接跑不带参数的版本，效果一样：
 
 ```bash
 python points_rescue.py
@@ -75,11 +80,11 @@ python points_rescue.py
 
 **为什么先演示**：用户看到报告才知道值不值得去申请 Token。直接要凭证，大部分人到这里就走了。
 
-### 1.2 用户想跑真实数据时，再引导配置
+### 2.2 用户想跑真实数据时，再引导配置
 
 ⚠️ **安全红线：绝对不要让用户把 Token 发到对话里。**
 
-正确做法是让用户**在自己的终端**完成配置，Token 全程不进对话：
+正确做法是让用户**在自己的终端**完成配置，Token 全程不进对话。
 
 **回给用户的话术（照这个说）**：
 
@@ -101,7 +106,7 @@ python points_rescue.py
 > 或者执行 `python points_rescue.py --web`，它会打开一个浏览器页面，
 > 三步走完：点按钮去官网拿 Token → 回来粘贴 → 直接出报告。
 
-### 1.3 用户问「为什么不能直接登录」
+### 2.3 用户问「为什么不能直接登录」
 
 这是高频问题，标准回答：
 
@@ -109,18 +114,18 @@ python points_rescue.py
 > 在第三方页面里输验证码，和钓鱼页面没法区分 —— 所以这一步我刻意留在官网，
 > 你能在地址栏看到 `open.mcd.cn` 确认是官方。剩下的都在这边完成。
 
-### 1.4 用户配置完之后
+### 2.4 用户配置完之后
 
 ```bash
 python points_rescue.py --doctor
 ```
 
-看到 `全部可用，可以跑 --live 了` 再进第 3 步。**不要跳过自检** ——
+看到全部可用再进第 4 步。**不要跳过自检** ——
 否则跑完发现门店没加载、覆盖率很低，很难排查。
 
 ---
 
-## 第 2 步：自检（有 Token 时也建议跑一次）
+## 第 3 步：自检（有 Token 时也建议跑一次）
 
 ```bash
 python points_rescue.py --doctor
@@ -133,7 +138,7 @@ python points_rescue.py --doctor
 
 ---
 
-## 第 3 步：跑分析
+## 第 4 步：跑分析
 
 ```bash
 python points_rescue.py --live --city <用户所在城市> --out report.html --json result.json
@@ -174,7 +179,7 @@ python points_rescue.py --live --city <用户所在城市> --out report.html --j
 
 ---
 
-## 第 4 步：讲人话（这一步决定用户满不满意）
+## 第 5 步：讲人话（这一步决定用户满不满意）
 
 **不要复述数字，给结论。** 先读 `result.json` 的关键字段：
 
@@ -221,7 +226,7 @@ python points_rescue.py --live --city <用户所在城市> --out report.html --j
 
 ---
 
-## 第 5 步：落地提醒（每次都要说）
+## 第 6 步：落地提醒（每次都要说）
 
 1. **本项目只读，不自动下单、不自动兑换、不点抽奖** —— 所有操作请用户在 App 里手动完成
 2. 券有有效期，**换完记得用**（用户的券失效率高达 80%，这是第二次损耗）
@@ -259,8 +264,9 @@ python points_rescue.py --live --city <用户所在城市> --out report.html --j
 
 | 现象 | 原因 | 处理 |
 |---|---|---|
-| `缺少 MCP Token` | 没配置 | 走第 1 步引导 |
+| `python: command not found` | 没装 Python 或没加 PATH | Mac/Linux 试 `python3`；Windows 试 `py` |
+| `缺少 MCP Token` | 没配置 | 走第 2 步引导 |
 | `401 unauthorized` | Token 过期 | 让用户重新去官网申请 |
-| 覆盖率很低（<40%） | 早餐时段，或门店菜单不全 | 看第 3 步的两个坑 |
+| 覆盖率很低（<40%） | 早餐时段，或门店菜单不全 | 看第 4 步的两个坑 |
 | `未能获取可用门店的菜单` | 城市名搜不到 | 换 `--city`，或用 `--store` 指定编码 |
 | 报告中很多"无法估值" | 正常，约 30% | 如实解释，不要试图凑数 |

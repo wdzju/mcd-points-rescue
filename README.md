@@ -200,7 +200,23 @@ python points_rescue.py --web
 </p>
 <p align="center"><sub>本机配置面板 —— 只监听 127.0.0.1，短信验证那一步刻意留在官网</sub></p>
 
-在 WorkBuddy 里用：见 [docs/WORKBUDDY.md](docs/WORKBUDDY.md)，本项目本身就是一个可直接安装的 Skill。
+### 作为 WorkBuddy Skill 使用
+
+本项目自带 Skill 定义，**不需要手动配置**。前提只有一个：用 WorkBuddy 打开**仓库目录本身**
+（不是它的父目录），然后直接说「帮我看看我的麦当劳积分」。
+
+AI 会自动读取 `.workbuddy/skills/mcd-points-rescue/SKILL.md`，按内置流程执行：
+
+```
+检查 Token → 没有就先跑演示给你看 → 再引导你配置 → 自检 → 分析 → 用大白话讲结论
+```
+
+**没 Token 也能启动** —— 它会先用演示数据生成一份报告，你看到效果之后再决定要不要配置。
+
+> 为什么必须打开仓库目录：WorkBuddy 只扫描 `{工作区}/.workbuddy/skills/`。
+> 如果打开的是父目录，Skill 不会被加载（但你仍然可以手动 @ 引用 `SKILL.md`）。
+
+详细说明见 [docs/WORKBUDDY.md](docs/WORKBUDDY.md)。
 
 ### 为什么不做一个登录页面
 
