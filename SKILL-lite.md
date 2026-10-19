@@ -49,14 +49,37 @@ allowed-tools: Read
 先确认能拿到积分数据。调一次 `query-my-account`：
 
 - **成功返回** → 继续
-- **报错 / 无此工具** → 停下，告诉用户：
-  > 需要先配置麦当劳 MCP 连接器。在 WorkBuddy 左侧【专家·技能·连接器】→【连接器】
-  > →【自定义连接器】→【配置 MCP】，填入下面的内容（Token 去 open.mcd.cn 申请）：
-  > ```json
-  > {"mcpServers":{"mcd-mcp":{"type":"streamablehttp","url":"https://mcp.mcd.cn","headers":{"Authorization":"Bearer 你的Token"}}}}
-  > ```
+- **报错 / 无此工具** → 停下，说明这个客户端还没接上麦当劳 MCP
 
-**不要索要用户的 Token**，让他在自己的配置里填。
+### 没接上时该怎么跟用户说
+
+**不要索要 Token**，让用户自己在客户端里填。话术：
+
+> 这需要你的 AI 能连上麦当劳 MCP。把下面这段加到你客户端的 MCP 配置里，
+> Token 去 <https://open.mcd.cn/mcp> 免费申请（手机号验证，约 1 分钟）：
+>
+> ```json
+> {"mcpServers":{"mcd-mcp":{"type":"streamablehttp","url":"https://mcp.mcd.cn","headers":{"Authorization":"Bearer 你的Token"}}}}
+> ```
+>
+> 各家客户端填的位置不一样，但认的都是 `mcpServers` 这个字段：
+>
+> | 客户端 | 在哪里填 |
+> |---|---|
+> | Claude Desktop | 配置文件里的 `mcpServers` |
+> | Cursor | Settings → MCP |
+> | Cherry Studio | 设置 → MCP 服务器 |
+> | WorkBuddy | 【连接器】→【自定义连接器】→【配置 MCP】 |
+> | 其他 | 找设置里的 MCP / 自定义连接器 |
+>
+> 填完重启客户端，回来跟我说一声。
+
+### 一个必须讲清的限制
+
+**AI 客户端本身得支持 MCP。** 纯网页对话（ChatGPT 网页、Kimi 网页这类）没有 MCP 能力，
+连不上 `mcp.mcd.cn`，也就算不出真实数据 —— 这类情况直接说明，不要硬编。
+
+这个技能**不绑定任何特定客户端**，只要它能连 MCP，流程就一样。
 
 ---
 

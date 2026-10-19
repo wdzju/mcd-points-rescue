@@ -137,13 +137,45 @@ python points_rescue.py --forget
 
 ---
 
-## 4. 在 WorkBuddy 里用（对话式，最省事）
+## 4. 在 AI 客户端里用（对话式，最省事）
 
-这一节讲怎么把它变成一个「说一句话就能用」的技能。
+这一节讲「让 AI 替你跑」，和上面的命令行是两条路。
 
-### 4.1 两种装法
+**不绑定任何特定客户端** —— Claude Desktop、Cursor、Cherry Studio、WorkBuddy 都能用，
+只要它能连 MCP。
 
-**装成全局技能（推荐）** —— 装一次，之后任何会话都能用：
+### 4.1 通用方式：复制一行链接（任何支持 MCP 的客户端）
+
+先把 MCP 配好。各家界面不同，但认的都是 `mcpServers` 这个字段：
+
+```json
+{"mcpServers":{"mcd-mcp":{"type":"streamablehttp","url":"https://mcp.mcd.cn","headers":{"Authorization":"Bearer 你的Token"}}}}
+```
+
+| 客户端 | 在哪里填 |
+|---|---|
+| Claude Desktop | 配置文件里的 `mcpServers` |
+| Cursor | Settings → MCP |
+| Cherry Studio | 设置 → MCP 服务器 |
+| WorkBuddy | 【连接器】→【自定义连接器】→【配置 MCP】 |
+| 其他 | 找设置里的 MCP / 自定义连接器 |
+
+然后直接发这句给 AI：
+
+```
+读一下 https://raw.githubusercontent.com/wdzju/mcd-points-rescue/main/SKILL-lite.md 然后按里面的流程帮我查麦当劳积分
+```
+
+AI 会自己去读那份纯提示词的说明，然后调接口、算结果、讲结论。
+
+> ⚠️ **纯网页对话用不了**（ChatGPT 网页、Kimi 网页这类）：没有 MCP 能力，
+> 连不上 `mcp.mcd.cn`，只能看演示数据，算不出你的真实账户。
+
+这是**零安装**路径，代价是精度不如 Python 版 —— 模糊匹配靠 AI，结果不可完全复现。
+
+### 4.2 WorkBuddy 额外支持：装成常驻技能
+
+如果你用 WorkBuddy，还可以把它装成技能，之后**说一句就自动触发**，不用每次贴链接。
 
 ```bash
 # macOS / Linux
@@ -153,51 +185,44 @@ git clone https://github.com/wdzju/mcd-points-rescue ~/.workbuddy/skills/mcd-poi
 
 Windows 上把目标路径换成 `%USERPROFILE%\.workbuddy\skills\mcd-points-rescue`。
 
-重启 WorkBuddy，然后在任意会话里说：
+重启 WorkBuddy，在任意会话里说：
 
 > 帮我看看我的麦当劳积分
 
-**不装，直接打开目录** —— 只想试一次的话：
+**或者不装，直接打开目录**：用 WorkBuddy 打开仓库目录（**必须是仓库本身，不是上级目录**），
+说同一句话。原因：WorkBuddy 只扫描 `{工作区}/.workbuddy/skills/`。
 
-```bash
-git clone https://github.com/wdzju/mcd-points-rescue
-```
+### 4.3 AI 会怎么执行（四个工具，四段输出）
 
-用 WorkBuddy 打开这个目录（**必须是仓库目录本身，不能是上级目录**），说同一句话。
+不管哪个客户端，流程都一样：
 
-> 为什么强调：WorkBuddy 只扫描 `{工作区}/.workbuddy/skills/`。
-> 打开上级目录时，技能不会被加载。
+| 步骤 | 工具 | 做什么 |
+|---|---|---|
+| 1 | `query-my-account` | 累计 / 已用 / 已过期 / 可用 / 本月到期，算蒸发率 |
+| 2 | `mall-points-products` | 券列表，按「菜单原价 − 券名价格」算收益，统一换算成 元/100积分 排序 |
+| 3 | `query-nearby-stores` + `query-meals` | 取菜单原价（指定城市/门店更好，不指定就按券名匹配） |
+| 4 | `query-lottery-info` | 有概率才算期望值，没概率只做定性判断 |
 
-### 4.2 最轻的方式：复制一行链接
+### 4.4 不需要配置 MCP 连接器（完整版的情况）
 
-连克隆都不想要的话，把你的 Token 配进 WorkBuddy 的 MCP 连接器，然后直接发这句：
+项目的 CLI **自己直连** `https://mcp.mcd.cn`（见 `src/mcp_client.py`），
+不依赖任何客户端机制。
 
-```
-读一下 https://raw.githubusercontent.com/wdzju/mcd-points-rescue/main/SKILL-lite.md 然后按里面的流程帮我查麦当劳积分
-```
-
-AI 会自己去读那份纯提示词的说明，然后调接口、算结果、讲结论。
-这是**零安装**路径，代价是精度不如 Python 版（模糊匹配靠 AI，结果不可完全复现）。
-
-### 4.3 不需要配置 MCP 连接器（完整版的情况）
-
-项目的 CLI **自己直连** `https://mcp.mcd.cn`，不依赖 WorkBuddy 的连接器机制。
-
-所以跑 `python points_rescue.py --live` 时**不用**去【连接器】里配置 `mcd-mcp`。
-`mcp-config.example.json` 只是给 WorkBuddy 或其他 MCP 客户端用的通用参考。
+所以跑 `python points_rescue.py --live` 时**不用**配 MCP 连接器。
+`mcp-config.example.json` 只是给 AI 客户端用的参考。
 
 Token 通过 `--token` / 环境变量 `MCD_MCP_TOKEN` / 本地文件三选一提供即可。
 
-### 4.4 两种形态的分工
+### 4.5 两种形态的分工
 
 | 场景 | 用哪个 |
 |---|---|
-| 日常快速问一句 | 对话式（Skill） |
+| 日常快速问一句 | 对话式（任何支持 MCP 的 AI） |
 | 要存档 HTML 报告 | CLI `--out` |
 | 要做二次开发 | CLI `--json` |
 | 校准字段名 | CLI `--dump-raw` |
 
-分析引擎完全相同，Skill 只是包了一层自然语言交互。
+分析引擎完全相同，对话式只是包了一层自然语言交互。
 
 ---
 

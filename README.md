@@ -38,14 +38,29 @@
 
 AI 会自己去读那份说明，然后调用麦当劳接口、算出结果、用大白话讲给你听。
 
-**唯一的前提**：你的 AI 能连上麦当劳 MCP。在 WorkBuddy 里配一次就行 ——
-【专家·技能·连接器】→【连接器】→【自定义连接器】→【配置 MCP】，填入：
+**唯一的前提**：你的 AI 得能连上麦当劳 MCP。把这段加进客户端的 MCP 配置：
 
 ```json
 {"mcpServers":{"mcd-mcp":{"type":"streamablehttp","url":"https://mcp.mcd.cn","headers":{"Authorization":"Bearer 你的Token"}}}}
 ```
 
-Token 去 <https://open.mcd.cn/mcp> 免费申请（手机号验证，约 1 分钟），替换掉上面那串字。
+Token 去 <https://open.mcd.cn/mcp> 免费申请（手机号验证，约 1 分钟），替换掉「你的Token」。
+
+各家客户端填的位置不同，但认的都是 `mcpServers` 这个字段：
+
+| 客户端 | 在哪里填 |
+|---|---|
+| Claude Desktop | 配置文件里的 `mcpServers` |
+| Cursor | Settings → MCP |
+| Cherry Studio | 设置 → MCP 服务器 |
+| WorkBuddy | 【连接器】→【自定义连接器】→【配置 MCP】 |
+| 其他 | 找设置里的 MCP / 自定义连接器 |
+
+**不绑定任何特定客户端** —— 只要它能连 MCP，这套流程就一样。
+
+> ⚠️ **纯网页对话用不了**（ChatGPT 网页、Kimi 网页这类）：它们没有 MCP 能力，
+> 连不上 `mcp.mcd.cn`，只能看演示数据，算不出你自己的账户。
+> 需要能装 MCP 的桌面客户端或 IDE 插件。
 
 配好之后，上面那句话就能用了。**以后再问，直接说「帮我查麦当劳积分」就行**，
 不用再贴链接。
@@ -224,9 +239,11 @@ python points_rescue.py --web
 </p>
 <p align="center"><sub>本机配置面板 —— 只监听 127.0.0.1，短信验证那一步刻意留在官网</sub></p>
 
-### 先试轻量版：一条命令装好，不用克隆、不用 Python
+### 想让它常驻？一条命令装好（WorkBuddy 用户）
 
-**前提只有一个**：在 WorkBuddy 里配好麦当劳 MCP 连接器（填一次 Token 就行）。
+> 其他客户端不需要这一步 —— 用上面那句「复制发给 AI」就够了。
+
+**前提**：已在客户端里配好麦当劳 MCP（见上面那张客户端对照表）。
 
 ```bash
 mkdir -p ~/.workbuddy/skills/mcd-points-check
